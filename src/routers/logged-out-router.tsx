@@ -1,19 +1,24 @@
 import { useForm } from "react-hook-form";
 
+interface IForm {
+  email: string;
+  password: string;
+}
+
 export const LoggedOutRouter = () => {
   const {
     register,
     watch,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm<IForm>();
   const onSubmit = () => {
     console.log(watch("email"));
   };
   const onInvalid = () => {
-    console.log(errors);
     console.log("cant log in");
   };
+
   return (
     <div>
       <h1>Logged Out</h1>
@@ -22,17 +27,22 @@ export const LoggedOutRouter = () => {
           <input
             {...register("email", {
               required: "This is required",
-              pattern: {
-                value:
-                  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@gmail.com$/,
-                message: "Email is invalid",
-              },
+              pattern:
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@gmail.com$/,
             })}
             className="border border-black"
             name="email"
             type="email"
             placeholder="e-mail"
           />
+          {errors.email?.message && (
+            <span className="font-bold text-red-600">
+              {errors.email?.message}
+            </span>
+          )}
+          {errors.email?.type === "pattern" && (
+            <span className="font-bold text-red-600">Only gmail allowed</span>
+          )}
         </div>
         <div>
           <input
