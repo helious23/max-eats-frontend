@@ -1,4 +1,16 @@
+import { gql, useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
+import { FormError } from "../components/form-error";
+
+const LOGIN_MUTATION = gql`
+  mutation PotatoMutation($email: String!, $password: String!) {
+    login(input: { email: $email, password: $password }) {
+      ok
+      token
+      error
+    }
+  }
+`;
 
 interface ILoginForm {
   email: string;
@@ -12,8 +24,15 @@ export const Login = () => {
     formState: { errors },
     handleSubmit,
   } = useForm<ILoginForm>();
+  const [loginMutation] = useMutation(LOGIN_MUTATION);
   const onSubmit = () => {
-    console.log(getValues());
+    const { email, password } = getValues();
+    loginMutation({
+      variables: {
+        email,
+        password,
+      },
+    });
   };
   return (
     <div className="h-screen flex items-center justify-center bg-gray-800">
@@ -32,14 +51,12 @@ export const Login = () => {
             className=" input mb-3 "
           />
           {errors.email?.message && (
-            <span className="font-medium text-red-500">
-              {errors.email?.message}
-            </span>
+            <FormError errorMessage={errors.email?.message} />
           )}
           <input
             {...register("password", {
               required: "패스워드가 필요합니다",
-              minLength: 10,
+              // minLength: 10,
             })}
             name="password"
             type="password"
@@ -48,15 +65,11 @@ export const Login = () => {
             className=" input"
           />
           {errors.password?.message && (
-            <span className="font-medium text-red-500">
-              {errors.password?.message}
-            </span>
+            <FormError errorMessage={errors.password?.message} />
           )}
-          {errors.password?.type === "minLength" && (
-            <span className="font-medium text-red-500">
-              패스워드는 10글자 이상입니다.
-            </span>
-          )}
+          {/* {errors.password?.type === "minLength" && (
+            <FormError errorMessage="패스워드는 10글자 이상입니다" />
+          )} */}
           <button className="btn mt-3">로그인</button>
         </form>
       </div>
