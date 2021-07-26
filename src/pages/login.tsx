@@ -30,14 +30,14 @@ export const Login = () => {
   } = useForm<ILoginForm>();
   const onCompleted = (data: loginMutation) => {
     const {
-      login: { ok, error, token },
+      login: { ok, token },
     } = data;
     if (ok) {
       console.log(token);
     }
   };
 
-  const [loginMutation, { data: loginMutationResult }] = useMutation<
+  const [loginMutation, { data: loginMutationResult, loading }] = useMutation<
     loginMutation,
     loginMutationVariables
   >(LOGIN_MUTATION, {
@@ -45,14 +45,17 @@ export const Login = () => {
   });
   const onSubmit = () => {
     const { email, password } = getValues();
-    loginMutation({
-      variables: {
-        loginInput: {
-          email,
-          password,
+    if (!loading) {
+      // 로딩중일때 mutation 실행되지 않게 함
+      loginMutation({
+        variables: {
+          loginInput: {
+            email,
+            password,
+          },
         },
-      },
-    });
+      });
+    }
   };
   return (
     <div className="h-screen flex items-center justify-center bg-gray-800">
@@ -90,7 +93,9 @@ export const Login = () => {
           {/* {errors.password?.type === "minLength" && (
             <FormError errorMessage="패스워드는 10글자 이상입니다" />
           )} */}
-          <button className="btn mt-3">로그인</button>
+          <button className="btn mt-3">
+            {loading ? "로딩중..." : "로그인"}
+          </button>
           {loginMutationResult?.login.error && (
             <FormError errorMessage={loginMutationResult.login.error} />
           )}
