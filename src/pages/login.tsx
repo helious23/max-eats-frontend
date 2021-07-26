@@ -28,10 +28,21 @@ export const Login = () => {
     formState: { errors },
     handleSubmit,
   } = useForm<ILoginForm>();
-  const [loginMutation, { data }] = useMutation<
+  const onCompleted = (data: loginMutation) => {
+    const {
+      login: { ok, error, token },
+    } = data;
+    if (ok) {
+      console.log(token);
+    }
+  };
+
+  const [loginMutation, { data: loginMutationResult }] = useMutation<
     loginMutation,
     loginMutationVariables
-  >(LOGIN_MUTATION);
+  >(LOGIN_MUTATION, {
+    onCompleted,
+  });
   const onSubmit = () => {
     const { email, password } = getValues();
     loginMutation({
@@ -80,6 +91,9 @@ export const Login = () => {
             <FormError errorMessage="패스워드는 10글자 이상입니다" />
           )} */}
           <button className="btn mt-3">로그인</button>
+          {loginMutationResult?.login.error && (
+            <FormError errorMessage={loginMutationResult.login.error} />
+          )}
         </form>
       </div>
     </div>
