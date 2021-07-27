@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import Helmet from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { FormError } from "../components/form-error";
 import {
@@ -9,7 +9,7 @@ import {
 import maxeatsLogo from "../images/maxeats.png";
 import { Button } from "../components/button";
 import { Link, useLocation } from "react-router-dom";
-import { isLoggedInVar } from "../apollo";
+import { logUserIn } from "../apollo";
 
 const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
@@ -40,9 +40,8 @@ export const Login = () => {
     const {
       login: { ok, token },
     } = data;
-    if (ok) {
-      console.log(token);
-      isLoggedInVar(true);
+    if (ok && token) {
+      logUserIn(token);
     }
   };
 
