@@ -6,6 +6,8 @@ import {
   loginMutationVariables,
 } from "../__generated__/loginMutation";
 import maxeatsLogo from "../images/maxeats.png";
+import { Button } from "../components/button";
+import { Link } from "react-router-dom";
 
 const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
@@ -23,12 +25,9 @@ interface ILoginForm {
 }
 
 export const Login = () => {
-  const {
-    register,
-    getValues,
-    formState: { errors },
-    handleSubmit,
-  } = useForm<ILoginForm>();
+  const { register, getValues, formState, handleSubmit } = useForm<ILoginForm>({
+    mode: "onChange",
+  });
   const onCompleted = (data: loginMutation) => {
     const {
       login: { ok, token },
@@ -65,20 +64,21 @@ export const Login = () => {
         <h4 className="w-full text-left text-2xl mb-5 font-medium lg:text-3xl">
           돌아오신 것을 환영합니다
         </h4>
+        <div className="w-full mt-5">이메일 주소로 로그인하세요</div>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="grid gap-3 mt-5 w-full"
+          className="grid gap-3 mt-3 w-full mb-3"
         >
           <input
             {...register("email", { required: "이메일 주소가 필요합니다" })}
             name="email"
             type="email"
             required
-            placeholder="E-mail"
+            placeholder="이메일"
             className="input"
           />
-          {errors.email?.message && (
-            <FormError errorMessage={errors.email?.message} />
+          {formState.errors.email?.message && (
+            <FormError errorMessage={formState.errors.email?.message} />
           )}
           <input
             {...register("password", {
@@ -87,18 +87,34 @@ export const Login = () => {
             name="password"
             type="password"
             required
-            placeholder="Password"
+            placeholder="패스워드"
             className=" input"
           />
-          {errors.password?.message && (
-            <FormError errorMessage={errors.password?.message} />
+          {formState.errors.password?.message && (
+            <FormError errorMessage={formState.errors.password?.message} />
           )}
-          <button className="btn">{loading ? "로딩중..." : "로그인"}</button>
+          <Button
+            canClick={formState.isValid}
+            loading={loading}
+            actionText={"로그인"}
+          />
           {loginMutationResult?.login.error && (
             <FormError errorMessage={loginMutationResult.login.error} />
           )}
         </form>
+        <div className="mt-3">
+          Max Eats는 처음이신가요?{" "}
+          <Link to="/create-account" className="text-lime-600 hover:underline">
+            계정 만들기
+          </Link>
+        </div>
       </div>
+      <footer className="absolute bottom-0 w-full h-24 lg:h-16 bg-gray-900 text-white text-xs flex items-center justify-between">
+        <div className="ml-3 lg:ml-20">
+          &copy; {new Date().getFullYear()} Max Technologies, Inc.
+        </div>
+        <div className="mr-3 lg:mr-20">개인정보 보호정책 | 이용약관</div>
+      </footer>
     </div>
   );
 };
