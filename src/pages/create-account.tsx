@@ -4,8 +4,12 @@ import { useForm } from "react-hook-form";
 import { FormError } from "../components/form-error";
 import maxeatsLogo from "../images/maxeats.png";
 import { Button } from "../components/button";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { UserRole } from "../__generated__/globalTypes";
+import {
+  createAccountMutation,
+  createAccountMutationVariables,
+} from "../__generated__/createAccountMutation";
 
 const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccountMutation($createAccountInput: CreateAccountInput!) {
@@ -30,12 +34,37 @@ export const CreateAccount = () => {
         role: UserRole.Client,
       },
     });
+  const history = useHistory();
+  const onCompleted = (data: createAccountMutation) => {
+    const {
+      createAccount: { ok },
+    } = data;
+    if (ok) {
+      history.push("/login");
+    }
+  };
 
-  const [createAccountMutaion, { loading }] = useMutation(
-    CREATE_ACCOUNT_MUTATION
-  );
-  const onSubmit = () => {};
-  console.log(watch());
+  const [createAccountMutaion, { loading, data: createAccountMutationResult }] =
+    useMutation<createAccountMutation, createAccountMutationVariables>(
+      CREATE_ACCOUNT_MUTATION,
+      {
+        onCompleted,
+      }
+    );
+  const onSubmit = () => {
+    if (!loading) {
+      const { email, password, role } = getValues();
+      createAccountMutaion({
+        variables: {
+          createAccountInput: {
+            email,
+            password,
+            role,
+          },
+        },
+      });
+    }
+  };
   return (
     <div className="h-full flex items-center flex-col mt-3 lg:mt-20">
       <Helmet>
@@ -52,7 +81,14 @@ export const CreateAccount = () => {
           className="grid gap-3 mt-3 w-full mb-3"
         >
           <input
-            {...register("email", { required: "이메일 주소가 필요합니다" })}
+            {...register("email", {
+              required: "이메일 주소가 필요합니다",
+              pattern: {
+                value:
+                  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                message: "유효한 이메일 주소가 아닙니다",
+              },
+            })}
             name="email"
             type="email"
             required
@@ -85,6 +121,11 @@ export const CreateAccount = () => {
             loading={loading}
             actionText={"계정 만들기"}
           />
+          {createAccountMutationResult?.createAccount.error && (
+            <FormError
+              errorMessage={createAccountMutationResult.createAccount.error}
+            />
+          )}
         </form>
         <div className="mt-3">
           Max Eats 계정이 있으신가요?{" "}

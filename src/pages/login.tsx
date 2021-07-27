@@ -9,6 +9,7 @@ import {
 import maxeatsLogo from "../images/maxeats.png";
 import { Button } from "../components/button";
 import { Link } from "react-router-dom";
+import { isLoggedInVar } from "../apollo";
 
 const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
@@ -35,6 +36,7 @@ export const Login = () => {
     } = data;
     if (ok) {
       console.log(token);
+      isLoggedInVar(true);
     }
   };
 
@@ -74,7 +76,14 @@ export const Login = () => {
           className="grid gap-3 mt-3 w-full mb-3"
         >
           <input
-            {...register("email", { required: "이메일 주소가 필요합니다" })}
+            {...register("email", {
+              required: "이메일 주소가 필요합니다",
+              pattern: {
+                value:
+                  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                message: "유효한 이메일 주소가 아닙니다",
+              },
+            })}
             name="email"
             type="email"
             required
