@@ -8,7 +8,7 @@ import {
 } from "../__generated__/loginMutation";
 import maxeatsLogo from "../images/maxeats.png";
 import { Button } from "../components/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { isLoggedInVar } from "../apollo";
 
 const LOGIN_MUTATION = gql`
@@ -24,11 +24,17 @@ const LOGIN_MUTATION = gql`
 interface ILoginForm {
   email: string;
   password: string;
+  message?: string;
 }
 
 export const Login = () => {
-  const { register, getValues, formState, handleSubmit } = useForm<ILoginForm>({
+  const location = useLocation<ILoginForm>();
+  const { register, formState, handleSubmit } = useForm<ILoginForm>({
     mode: "onChange",
+    defaultValues: {
+      email: location?.state?.email || "",
+      password: location?.state?.password || "",
+    },
   });
   const onCompleted = (data: loginMutation) => {
     const {
@@ -46,8 +52,8 @@ export const Login = () => {
   >(LOGIN_MUTATION, {
     onCompleted,
   });
-  const onSubmit = () => {
-    const { email, password } = getValues();
+  const onSubmit = (data: ILoginForm) => {
+    const { email, password } = data;
     if (!loading) {
       // 로딩중일때 mutation 실행되지 않게 함
       loginMutation({
@@ -71,6 +77,13 @@ export const Login = () => {
           돌아오신 것을 환영합니다
         </h4>
         <div className="w-full mt-5">이메일 주소로 로그인하세요</div>
+        <div
+          className={`${
+            location.state?.message ? "text-lime-600 mt-5 font-medium" : ""
+          }`}
+        >
+          {location.state?.message ? location.state.message : ""}
+        </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="grid gap-3 mt-3 w-full mb-3"
@@ -88,7 +101,11 @@ export const Login = () => {
             type="email"
             required
             placeholder="이메일"
-            className="input"
+            className={`input ${
+              formState.errors.email?.message
+                ? "focus:border-red-500"
+                : "focus:border-gray-700"
+            }`}
           />
           {formState.errors.email?.message && (
             <FormError errorMessage={formState.errors.email?.message} />
@@ -101,7 +118,11 @@ export const Login = () => {
             type="password"
             required
             placeholder="패스워드"
-            className=" input"
+            className={`input ${
+              formState.errors.password?.message
+                ? "focus:border-red-500"
+                : "focus:border-gray-700"
+            }`}
           />
           {formState.errors.password?.message && (
             <FormError errorMessage={formState.errors.password?.message} />

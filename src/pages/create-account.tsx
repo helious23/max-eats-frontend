@@ -27,20 +27,26 @@ interface ICreateAccountForm {
 }
 
 export const CreateAccount = () => {
-  const { register, getValues, formState, handleSubmit, watch } =
+  const { register, getValues, formState, handleSubmit } =
     useForm<ICreateAccountForm>({
       mode: "onChange",
       defaultValues: {
         role: UserRole.Client,
       },
     });
+
   const history = useHistory();
   const onCompleted = (data: createAccountMutation) => {
+    const { email, password } = getValues();
     const {
       createAccount: { ok },
     } = data;
     if (ok) {
-      history.push("/login");
+      history.push("/login", {
+        message: "계정이 생성되었습니다. 로그인 하세요.",
+        email,
+        password,
+      });
     }
   };
 
@@ -51,9 +57,10 @@ export const CreateAccount = () => {
         onCompleted,
       }
     );
-  const onSubmit = () => {
+
+  const onSubmit = (data: ICreateAccountForm) => {
+    const { email, password, role } = data;
     if (!loading) {
-      const { email, password, role } = getValues();
       createAccountMutaion({
         variables: {
           createAccountInput: {
@@ -93,7 +100,11 @@ export const CreateAccount = () => {
             type="email"
             required
             placeholder="이메일"
-            className="input"
+            className={`input ${
+              formState.errors.email?.message
+                ? "focus:border-red-500"
+                : "focus:border-gray-700"
+            }`}
           />
           {formState.errors.email?.message && (
             <FormError errorMessage={formState.errors.email?.message} />
@@ -106,7 +117,11 @@ export const CreateAccount = () => {
             type="password"
             required
             placeholder="패스워드"
-            className=" input"
+            className={`input ${
+              formState.errors.password?.message
+                ? "focus:border-red-500"
+                : "focus:border-gray-700"
+            }`}
           />
           {formState.errors.password?.message && (
             <FormError errorMessage={formState.errors.password?.message} />
