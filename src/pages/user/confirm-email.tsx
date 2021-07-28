@@ -1,5 +1,6 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { useQueryParam } from "../../hooks/useQueryParam";
+import { useMe } from "../../hooks/useMe";
 import {
   verifyEmail,
   verifyEmailVariables,
@@ -15,14 +16,40 @@ const VERIFY_EMAIL_MUTATION = gql`
 `;
 
 export const ConfirmEmail = () => {
-  const [verifyEmail, { loading: verifyingEmail }] = useMutation<
-    verifyEmail,
-    verifyEmailVariables
-  >(VERIFY_EMAIL_MUTATION);
+  const { data: userData } = useMe();
+  const client = useApolloClient(); // client 불러옴
+  const onCompleted = (data: verifyEmail) => {
+    const {
+      verifyEmail: { ok },
+    } = data;
+
+    if (ok && userData?.me.id) {
+      client.writeFragment({
+        id: `User:${userData?.me.id}`, // apollo cache 의 User:1 과 똑같이 기재햐야됨
+        // User entity 의 verified 만 fragment 로 수정
+        fragment: gql`
+          fragment VerifiedUser on User {
+            verified
+          }
+        `,
+        data: {
+          // 수정할 data
+          verified: true,
+        },
+      });
+    }
+  };
+
+  const [verifyEmailMutation] = useMutation<verifyEmail, verifyEmailVariables>(
+    VERIFY_EMAIL_MUTATION,
+    {
+      onCompleted,
+    }
+  );
   const param = useQueryParam();
   const code = param.get("code");
   if (code) {
-    verifyEmail({ variables: { input: { code } } });
+    verifyEmailMutation({ variables: { input: { code } } });
   }
   return (
     <div className=" mt-64 flex flex-col items-center justify-center">
