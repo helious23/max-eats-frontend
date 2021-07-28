@@ -1,8 +1,8 @@
-interface ILogoFile {
+interface ILogoProps {
   logoFile: string;
-  size: string;
+  option?: string;
 }
 
-export const Logo: React.FC<ILogoFile> = ({ logoFile, size }) => (
-  <img src={logoFile} alt="logo" className={`${size} mb-10 lg:mb-16`} />
+export const Logo: React.FC<ILogoProps> = ({ logoFile, option }) => (
+  <img src={logoFile} alt="logo" className={`${option}`} />
 );

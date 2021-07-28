@@ -80,7 +80,7 @@ export const CreateAccount = () => {
         <title> Create Account | MaxEats</title>
       </Helmet>
       <div className="w-full max-w-screen-sm flex flex-col px-5 items-center">
-        <Logo logoFile={maxeatsLogo} size="w-44" />
+        <Logo logoFile={maxeatsLogo} option="w-44 mb-10 lg:mb-16" />
         <h4 className="w-full text-left text-2xl mb-5 font-medium lg:text-3xl">
           시작하기
         </h4>
