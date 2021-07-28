@@ -6,6 +6,7 @@ import maxeatsLogo from "../images/maxeats.png";
 import { Button } from "../components/button";
 import { Link, useHistory } from "react-router-dom";
 import { UserRole } from "../__generated__/globalTypes";
+import routes from "../routes";
 import {
   createAccountMutation,
   createAccountMutationVariables,
@@ -42,7 +43,7 @@ export const CreateAccount = () => {
       createAccount: { ok },
     } = data;
     if (ok) {
-      history.push("/login", {
+      history.push(routes.home, {
         message: "계정이 생성되었습니다. 로그인 하세요.",
         email,
         password,
@@ -144,7 +145,7 @@ export const CreateAccount = () => {
         </form>
         <div className="mt-3">
           Max Eats 계정이 있으신가요?{" "}
-          <Link to="/login" className="text-lime-600 hover:underline">
+          <Link to={routes.home} className="text-lime-600 hover:underline">
             로그인 하기
           </Link>
         </div>

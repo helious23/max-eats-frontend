@@ -10,6 +10,7 @@ import maxeatsLogo from "../images/maxeats.png";
 import { Button } from "../components/button";
 import { Link, useLocation } from "react-router-dom";
 import { logUserIn } from "../apollo";
+import routes from "../routes";
 
 const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
@@ -137,7 +138,10 @@ export const Login = () => {
         </form>
         <div className="mt-3">
           Max Eats는 처음이신가요?{" "}
-          <Link to="/create-account" className="text-lime-600 hover:underline">
+          <Link
+            to={routes.createAccount}
+            className="text-lime-600 hover:underline"
+          >
             계정 만들기
           </Link>
         </div>
