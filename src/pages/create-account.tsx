@@ -7,6 +7,7 @@ import { Button } from "../components/button";
 import { Link, useHistory } from "react-router-dom";
 import { UserRole } from "../__generated__/globalTypes";
 import routes from "../routes";
+import { Logo } from "./logo";
 import {
   createAccountMutation,
   createAccountMutationVariables,
@@ -79,7 +80,7 @@ export const CreateAccount = () => {
         <title> Create Account | MaxEats</title>
       </Helmet>
       <div className="w-full max-w-screen-sm flex flex-col px-5 items-center">
-        <img src={maxeatsLogo} alt="logo" className="w-44 mb-10 lg:mb-16" />
+        <Logo logoFile={maxeatsLogo} size="w-44" />
         <h4 className="w-full text-left text-2xl mb-5 font-medium lg:text-3xl">
           시작하기
         </h4>
