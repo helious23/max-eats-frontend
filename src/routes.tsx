@@ -1,8 +1,8 @@
 const routes = {
   home: "/",
   createAccount: "/create-account",
-  myProfile: "/my-profile",
   confirmEmail: "/confirm",
+  editProfile: "/edit-profile",
 };
 
 export default routes;

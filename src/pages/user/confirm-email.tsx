@@ -1,6 +1,8 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { useQueryParam } from "../../hooks/useQueryParam";
 import { useMe } from "../../hooks/useMe";
+import { useHistory } from "react-router-dom";
+import routes from "../../routes";
 import {
   verifyEmail,
   verifyEmailVariables,
@@ -16,6 +18,7 @@ const VERIFY_EMAIL_MUTATION = gql`
 `;
 
 export const ConfirmEmail = () => {
+  const history = useHistory();
   const { data: userData } = useMe();
   const client = useApolloClient(); // client 불러옴
   const onCompleted = (data: verifyEmail) => {
@@ -37,6 +40,7 @@ export const ConfirmEmail = () => {
           verified: true,
         },
       });
+      history.push(routes.home);
     }
   };
 

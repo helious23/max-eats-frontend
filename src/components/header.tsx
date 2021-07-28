@@ -19,7 +19,7 @@ export const Header: React.FC = () => {
         <div className="w-full px-5 xlg:px-0 max-w-screen-2xl mx-auto flex justify-between items-center">
           <Logo logoFile={maxeatslogo} option="w-32" />
           <span className="text-base">
-            <Link to={routes.myProfile}>
+            <Link to={routes.editProfile}>
               <FontAwesomeIcon icon={faUser} className="text-xl" />
             </Link>
           </span>
