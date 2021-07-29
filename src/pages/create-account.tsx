@@ -1,5 +1,4 @@
 import { gql, useMutation } from "@apollo/client";
-import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { FormError } from "../components/form-error";
 import maxeatsLogo from "../images/maxeats.png";
@@ -8,6 +7,7 @@ import { Link, useHistory } from "react-router-dom";
 import { UserRole } from "../__generated__/globalTypes";
 import routes from "../routes";
 import { Logo } from "./logo";
+import { PageTitle } from "../components/page-title";
 import {
   createAccountMutation,
   createAccountMutationVariables,
@@ -76,9 +76,7 @@ export const CreateAccount = () => {
   };
   return (
     <div className="h-full flex items-center flex-col mt-3 lg:mt-20">
-      <Helmet>
-        <title> Create Account | MaxEats</title>
-      </Helmet>
+      <PageTitle title={"회원 가입"} />
       <div className="w-full max-w-screen-sm flex flex-col px-5 items-center">
         <Logo logoFile={maxeatsLogo} option="w-44 mb-10 lg:mb-16" />
         <h4 className="w-full text-left text-2xl mb-5 font-medium lg:text-3xl">

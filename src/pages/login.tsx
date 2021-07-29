@@ -1,5 +1,4 @@
 import { gql, useMutation } from "@apollo/client";
-import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { FormError } from "../components/form-error";
 import {
@@ -11,6 +10,7 @@ import { Button } from "../components/button";
 import { Link, useLocation } from "react-router-dom";
 import { logUserIn } from "../apollo";
 import routes from "../routes";
+import { PageTitle } from "../components/page-title";
 
 const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
@@ -68,9 +68,7 @@ export const Login = () => {
   };
   return (
     <div className="h-full flex items-center flex-col mt-3 lg:mt-20">
-      <Helmet>
-        <title>Login | MaxEats</title>
-      </Helmet>
+      <PageTitle title={"로그인"} />
       <div className="w-full max-w-screen-sm flex flex-col px-5 items-center">
         <img src={maxeatsLogo} alt="logo" className="w-44 mb-10 lg:mb-16" />
         <h4 className="w-full text-left text-2xl mb-5 font-medium lg:text-3xl">
