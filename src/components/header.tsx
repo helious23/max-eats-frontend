@@ -3,11 +3,17 @@ import { Logo } from "../pages/logo";
 import { useMe } from "../hooks/useMe";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOutAlt, faUser } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import routes from "../routes";
 import { logUserOut } from "../apollo";
 
 export const Header: React.FC = () => {
+  const history = useHistory();
+  const onClick = () => {
+    logUserOut();
+    history.push(routes.home);
+  };
+
   const { data } = useMe();
   return (
     <>
@@ -19,7 +25,9 @@ export const Header: React.FC = () => {
       <header className="py-4">
         <div className="w-full px-5 xlg:px-0 max-w-screen-2xl mx-auto flex justify-between items-center">
           <div>
-            <Logo logoFile={maxeatslogo} option="w-32" />
+            <Link to={routes.home}>
+              <Logo logoFile={maxeatslogo} option="w-32" />
+            </Link>
           </div>
           <div>
             <span className="text-base">
@@ -31,7 +39,7 @@ export const Header: React.FC = () => {
               <FontAwesomeIcon
                 icon={faSignOutAlt}
                 className="text-xl cursor-pointer"
-                onClick={logUserOut}
+                onClick={onClick}
               />
             </span>
           </div>

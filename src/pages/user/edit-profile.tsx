@@ -3,7 +3,7 @@ import { useMe } from "../../hooks/useMe";
 import { useForm } from "react-hook-form";
 import { PageTitle } from "../../components/page-title";
 import { FormError } from "../../components/form-error";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useApolloClient } from "@apollo/client";
 import { useHistory } from "react-router-dom";
 import routes from "../../routes";
 import {
@@ -28,6 +28,7 @@ interface IFormProps {
 export const EditProfile = () => {
   const history = useHistory();
   const { data: userData } = useMe();
+  const client = useApolloClient();
   const { register, formState, handleSubmit, getValues } = useForm<IFormProps>({
     mode: "onChange",
     defaultValues: {
@@ -39,7 +40,7 @@ export const EditProfile = () => {
     const {
       editProfile: { ok },
     } = data;
-    if (ok) {
+    if (ok && userData) {
       // update cache
       // 현재 email 과 password 둘 다 변경시, 동일 password 변경 시  validation 안됨
       // 이후 백엔드에서 editPassword 생성 후 route 분리하여 관리해야 될듯
@@ -49,6 +50,25 @@ export const EditProfile = () => {
         alert("패스워드 변경이 완료되었습니다");
       } else if (Boolean(getValues("email"))) {
         alert("이메일 변경이 완료되었습니다. 이메일 인증을 해주세요.");
+      }
+      const {
+        me: { email: prevEmail, id },
+      } = userData;
+      const { email: newEmail } = getValues();
+      if (prevEmail !== newEmail && newEmail !== "") {
+        client.writeFragment({
+          id: `User:${id}`,
+          fragment: gql`
+            fragment EditedUser on User {
+              email
+              verified
+            }
+          `,
+          data: {
+            email: newEmail,
+            verified: false,
+          },
+        });
       }
       history.push(routes.home);
     }
