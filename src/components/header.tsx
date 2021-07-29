@@ -24,11 +24,9 @@ export const Header: React.FC = () => {
       )}
       <header className="py-4">
         <div className="w-full px-5 xlg:px-0 max-w-screen-2xl mx-auto flex justify-between items-center">
-          <div>
-            <Link to={routes.home}>
-              <Logo logoFile={maxeatslogo} option="w-32" />
-            </Link>
-          </div>
+          <Link to={routes.home}>
+            <Logo logoFile={maxeatslogo} option="w-32  absolute top-0" />
+          </Link>
           <div>
             <span className="text-base">
               <Link to={routes.editProfile}>

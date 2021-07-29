@@ -11,6 +11,7 @@ import { Link, useLocation } from "react-router-dom";
 import { logUserIn } from "../apollo";
 import routes from "../routes";
 import { PageTitle } from "../components/page-title";
+import { Logo } from "./logo";
 
 const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
@@ -70,7 +71,7 @@ export const Login = () => {
     <div className="h-full flex items-center flex-col mt-3 lg:mt-20">
       <PageTitle title={"로그인"} />
       <div className="w-full max-w-screen-sm flex flex-col px-5 items-center">
-        <img src={maxeatsLogo} alt="logo" className="w-44 mb-10 lg:mb-16" />
+        <Logo logoFile={maxeatsLogo} option="w-44 mb-10 lg:mb-16" />
         <h4 className="w-full text-left text-2xl mb-5 font-medium lg:text-3xl">
           돌아오신 것을 환영합니다
         </h4>
