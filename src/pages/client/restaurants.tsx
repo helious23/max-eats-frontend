@@ -4,6 +4,8 @@ import {
   restaurantsPageQuery,
   restaurantsPageQueryVariables,
 } from "../../__generated__/restaurantsPageQuery";
+import { Categories } from "../../components/categories";
+import { Restaurant } from "../../components/restaurant";
 
 const RESTAURANTS_QUERY = gql`
   query restaurantsPageQuery($input: RestaurantsInput!) {
@@ -61,16 +63,13 @@ export const Restaurants: React.FC = () => {
       {!loading && (
         <div className="max-w-screen-2xl mx-auto mt-8">
           <div className="flex justify-around max-w-xl mx-auto">
-            {data?.allCategories.categories?.map((catetory) => (
-              <div className="flex flex-col items-center">
-                <div
-                  className="w-16 h-16 rounded-full bg-cover hover:bg-gray-100 cursor-pointer"
-                  style={{ backgroundImage: `url(${catetory.coverImg})` }}
-                ></div>
-                <span className="mt-1 text-sm text-center font-medium cursor-pointer">
-                  {catetory.name}
-                </span>
-              </div>
+            {data?.allCategories.categories?.map((category) => (
+              <Categories category={category} />
+            ))}
+          </div>
+          <div className="grid grid-cols-3 gap-x-5 gap-y-10 mt-10">
+            {data?.restaurants.results?.map((restaurant) => (
+              <Restaurant restaurant={restaurant} />
             ))}
           </div>
         </div>
