@@ -8,6 +8,7 @@ import { ConfirmEmail } from "../pages/user/confirm-email";
 import { EditProfile } from "../pages/user/edit-profile";
 import { Search } from "../pages/client/search";
 import { Category } from "../pages/client/category";
+import { RestaurantDetail } from "../pages/client/restaurant-detail";
 
 const ClientRoutes = [
   <Route key={routes.home} path={routes.home} exact>
@@ -24,6 +25,9 @@ const ClientRoutes = [
   </Route>,
   <Route key={routes.category} path={routes.category}>
     <Category />
+  </Route>,
+  <Route key={routes.restaurant} path={routes.restaurant}>
+    <RestaurantDetail />
   </Route>,
 ];
 

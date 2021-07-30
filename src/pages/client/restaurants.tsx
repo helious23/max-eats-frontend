@@ -97,7 +97,7 @@ export const Restaurants: React.FC = () => {
       </form>
       {!loading && (
         <div className="max-w-screen-xl mx-auto mt-8 pb-20">
-          <div className="flex justify-around max-w-xl mx-auto">
+          <div className="flex justify-start max-w-md overflow-hidden md:justify-around md:max-w-3xl mx-auto">
             {data?.allCategories.categories?.map((category) => (
               <Link key={category.id} to={`/category/${category.slug}`}>
                 <Categories key={category.id} category={category} />
@@ -106,7 +106,9 @@ export const Restaurants: React.FC = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
             {data?.restaurants.results?.map((restaurant) => (
-              <Restaurant key={restaurant.id} restaurant={restaurant} />
+              <Link key={restaurant.id} to={`/restaurant/${restaurant.id}`}>
+                <Restaurant key={restaurant.id} restaurant={restaurant} />
+              </Link>
             ))}
           </div>
           <div className="grid grid-cols-3 text-center max-w-md items-center justify-center mx-auto mt-10">

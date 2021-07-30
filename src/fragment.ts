@@ -7,6 +7,7 @@ export const RESTAURANT_FRAGMENT = gql`
     coverImg
     category {
       name
+      slug
     }
     address
     isPromoted
@@ -20,5 +21,23 @@ export const CATEGORY_FRAGMENT = gql`
     coverImg
     slug
     restaurantCount
+  }
+`;
+
+export const MENU_FRAGMENT = gql`
+  fragment MenuParts on Dish {
+    id
+    name
+    price
+    photo
+    description
+    options {
+      name
+      choices {
+        name
+        extra
+      }
+      extra
+    }
   }
 `;

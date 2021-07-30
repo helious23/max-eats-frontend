@@ -34,7 +34,7 @@ export const Search = () => {
   const location = useLocation();
   const history = useHistory();
   const [page, setPage] = useState(1);
-  const [callQuery, { loading, data, called }] = useLazyQuery<
+  const [callQuery, { loading, data }] = useLazyQuery<
     searchRestaurant,
     searchRestaurantVariables
   >(SEARCH_RESTAURANT);
@@ -95,7 +95,9 @@ export const Search = () => {
           <div className="max-w-screen-xl mx-auto mt-8 pb-20">
             <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
               {data?.searchRestaurant.restaurants?.map((restaurant) => (
-                <Restaurant key={restaurant.id} restaurant={restaurant} />
+                <Link key={restaurant.id} to={`/restaurant/${restaurant.id}`}>
+                  <Restaurant key={restaurant.id} restaurant={restaurant} />
+                </Link>
               ))}
             </div>
             {data?.searchRestaurant.totalPages &&
