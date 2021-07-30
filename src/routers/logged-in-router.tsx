@@ -7,6 +7,7 @@ import { useMe } from "../hooks/useMe";
 import { ConfirmEmail } from "../pages/user/confirm-email";
 import { EditProfile } from "../pages/user/edit-profile";
 import { Search } from "../pages/client/search";
+import { Category } from "../pages/client/category";
 
 const ClientRoutes = [
   <Route key={routes.home} path={routes.home} exact>
@@ -20,6 +21,9 @@ const ClientRoutes = [
   </Route>,
   <Route key={routes.search} path={routes.search}>
     <Search />
+  </Route>,
+  <Route key={routes.category} path={routes.category}>
+    <Category />
   </Route>,
 ];
 

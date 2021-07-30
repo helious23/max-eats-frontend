@@ -10,7 +10,7 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from "react-hook-form";
 import { FormError } from "../../components/form-error";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import {
   faChevronLeft,
   faChevronRight,
@@ -97,7 +97,9 @@ export const Restaurants: React.FC = () => {
         <div className="max-w-screen-xl mx-auto mt-8 pb-20">
           <div className="flex justify-around max-w-xl mx-auto">
             {data?.allCategories.categories?.map((category) => (
-              <Categories key={category.id} category={category} />
+              <Link key={category.id} to={`/category/${category.slug}`}>
+                <Categories key={category.id} category={category} />
+              </Link>
             ))}
           </div>
           <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">

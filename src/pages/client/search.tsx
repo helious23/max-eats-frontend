@@ -31,6 +31,7 @@ export const Search = () => {
     searchRestaurant,
     searchRestaurantVariables
   >(SEARCH_RESTAURANT);
+
   useEffect(() => {
     const query = location.search.split("?term=")[1];
     if (!query) {

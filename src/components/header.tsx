@@ -1,8 +1,11 @@
-import maxeatslogo from "../images/maxeats.png";
-import { Logo } from "../pages/logo";
+import logoFile from "../images/maxeats.png";
 import { useMe } from "../hooks/useMe";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignOutAlt, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBars,
+  faSignOutAlt,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { Link, useHistory } from "react-router-dom";
 import routes from "../routes";
 import { logUserOut } from "../apollo";
@@ -22,11 +25,21 @@ export const Header: React.FC = () => {
           <span>이메일 인증을 진행해 주세요</span>
         </div>
       )}
-      <header className="py-4">
-        <div className="w-full px-5 xlg:px-0 max-w-screen-2xl mx-auto flex justify-between items-center">
-          <Link to={routes.home}>
-            <Logo logoFile={maxeatslogo} option="w-32  absolute top-0" />
-          </Link>
+      <header className="py-8">
+        <div className="w-full px-5 2xl:px-0 max-w-screen-2xl mx-auto flex justify-between items-center">
+          <div className="flex">
+            <FontAwesomeIcon
+              icon={faBars}
+              className="text-lg font-light mr-5 cursor-pointer"
+            />
+            <Link to={routes.home}>
+              <img
+                src={logoFile}
+                alt="logo"
+                className="w-32 relative bottom-3.5"
+              />
+            </Link>
+          </div>
           <div>
             <span className="text-base">
               <Link to={routes.editProfile}>

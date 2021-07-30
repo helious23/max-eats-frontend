@@ -4,6 +4,7 @@ const routes = {
   confirmEmail: "/confirm",
   editProfile: "/edit-profile",
   search: "/search",
+  category: "/category/:slug",
 };
 
 export default routes;
