@@ -60,6 +60,7 @@ export const Restaurants: React.FC = () => {
 
   const onNextPageClick = () => setPage((current) => current + 1);
   const onPrevPageClick = () => setPage((current) => current - 1);
+
   const { register, handleSubmit, formState } = useForm<IFormProps>();
   const history = useHistory();
 
@@ -70,6 +71,7 @@ export const Restaurants: React.FC = () => {
       search: `?term=${searchTerm}`,
     });
   };
+
   return (
     <div>
       <PageTitle title={"온라인으로 음식을 주문하세요"} />
