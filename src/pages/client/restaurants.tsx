@@ -16,6 +16,7 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import routes from "../../routes";
+import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragment";
 
 const RESTAURANTS_QUERY = gql`
   query restaurantsPageQuery($input: RestaurantsInput!) {
@@ -23,11 +24,7 @@ const RESTAURANTS_QUERY = gql`
       ok
       error
       categories {
-        id
-        name
-        coverImg
-        slug
-        restaurantCount
+        ...CategoryParts
       }
     }
     restaurants(input: $input) {
@@ -36,17 +33,12 @@ const RESTAURANTS_QUERY = gql`
       totalPages
       totalResults
       results {
-        id
-        name
-        coverImg
-        category {
-          name
-        }
-        address
-        isPromoted
+        ...RestaurantParts
       }
     }
   }
+  ${RESTAURANT_FRAGMENT}
+  ${CATEGORY_FRAGMENT}
 `;
 
 export const Restaurants: React.FC = () => {
