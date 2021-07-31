@@ -59,7 +59,13 @@ export const Category = () => {
       {!loading && (
         <div>
           {data?.category.category && (
-            <Categories category={data.category.category} />
+            <Categories
+              id={data.category.category.id}
+              key={data.category.category.id}
+              name={data.category.category.name}
+              coverImg={data.category.category.coverImg}
+              slug={data.category.category.slug}
+            />
           )}
           <div className="max-w-screen-xl mx-auto mt-8 pb-20">
             <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
