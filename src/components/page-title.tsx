@@ -7,7 +7,7 @@ interface IPageTitleProps {
 export const PageTitle: React.FC<IPageTitleProps> = ({ title }) => {
   return (
     <Helmet>
-      <title>{title} | Max Eats </title>
+      <title>{title} | Max Eats</title>
     </Helmet>
   );
 };

@@ -3,6 +3,7 @@ import { render, waitFor } from "@testing-library/react";
 import { Header } from "../header";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ME_QUERY } from "../../hooks/useMe";
+import userEvent from "@testing-library/user-event";
 
 const mockedMeQuery = {
   request: {
@@ -73,8 +74,8 @@ describe("<Header />", () => {
     });
   });
 
-  it("should log out", () => {
-    const { debug } = render(
+  it("should log out", async () => {
+    const { debug, getByRole } = render(
       <MockedProvider mocks={[mockedMeQuery]}>
         <Router>
           <Header />
