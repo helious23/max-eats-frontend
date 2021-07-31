@@ -19,7 +19,7 @@ jest.mock("../../routers/logged-in-router.tsx", () => {
 
 describe("<App />", () => {
   it("renders LoggedOutRouter", () => {
-    const { getByText } = render(<App />); // render 함수로 App component 를 넘겨줌
+    const { getByText } = render(<App />); // render 함수로 App component 를 넘겨줌 from @testing-library/react
     getByText("logged-out"); // text 가 있는지 확인
   });
   it("renders LoggedInRouter", async () => {
