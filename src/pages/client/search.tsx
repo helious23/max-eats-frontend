@@ -95,9 +95,13 @@ export const Search = () => {
           <div className="max-w-screen-xl mx-auto mt-8 pb-20">
             <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
               {data?.searchRestaurant.restaurants?.map((restaurant) => (
-                <Link key={restaurant.id} to={`/restaurant/${restaurant.id}`}>
-                  <Restaurant key={restaurant.id} restaurant={restaurant} />
-                </Link>
+                <Restaurant
+                  key={restaurant.id}
+                  id={restaurant.id}
+                  coverImg={restaurant.coverImg}
+                  name={restaurant.name}
+                  categoryName={restaurant.category?.name}
+                />
               ))}
             </div>
             {data?.searchRestaurant.totalPages &&

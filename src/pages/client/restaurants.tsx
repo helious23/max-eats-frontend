@@ -106,9 +106,13 @@ export const Restaurants: React.FC = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
             {data?.restaurants.results?.map((restaurant) => (
-              <Link key={restaurant.id} to={`/restaurant/${restaurant.id}`}>
-                <Restaurant key={restaurant.id} restaurant={restaurant} />
-              </Link>
+              <Restaurant
+                key={restaurant.id}
+                id={restaurant.id}
+                name={restaurant.name}
+                coverImg={restaurant.coverImg}
+                categoryName={restaurant.category?.name}
+              />
             ))}
           </div>
           <div className="grid grid-cols-3 text-center max-w-md items-center justify-center mx-auto mt-10">

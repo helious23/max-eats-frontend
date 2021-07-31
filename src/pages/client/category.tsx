@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragment";
 import { category, categoryVariables } from "../../__generated__/category";
@@ -64,9 +64,13 @@ export const Category = () => {
           <div className="max-w-screen-xl mx-auto mt-8 pb-20">
             <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
               {data?.category.restaurants?.map((restaurant) => (
-                <Link key={restaurant.id} to={`/restaurant/${restaurant.id}`}>
-                  <Restaurant key={restaurant.id} restaurant={restaurant} />
-                </Link>
+                <Restaurant
+                  key={restaurant.id}
+                  id={restaurant.id}
+                  coverImg={restaurant.coverImg}
+                  name={restaurant.name}
+                  categoryName={restaurant.category?.name}
+                />
               ))}
             </div>
             <div className="grid grid-cols-3 text-center max-w-md items-center justify-center mx-auto mt-10">
