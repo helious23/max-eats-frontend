@@ -5,20 +5,23 @@ import {
   RenderResult,
   waitFor,
 } from "@testing-library/react";
-import { Login } from "../login";
+import { Login, LOGIN_MUTATION } from "../login";
 import { ApolloProvider } from "@apollo/client";
-import { createMockClient } from "mock-apollo-client";
+import { createMockClient, MockApolloClient } from "mock-apollo-client";
 import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter as Router } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
+import { debugPort } from "process";
 
 describe("<Login />", () => {
   let renderResults: RenderResult; // test 에서 render 에 접근하기 위해 변수 생성
   let errorMessage: HTMLElement;
+  let mockedClient: MockApolloClient;
+
   beforeEach(async () => {
     // test 마다 render 시키기 위해 beforeEach 사용
     await waitFor(() => {
-      const mockedClient = createMockClient(); // client 를 mock
+      mockedClient = createMockClient(); // client 를 mock
       renderResults = render(
         <HelmetProvider>
           <Router>
@@ -52,13 +55,49 @@ describe("<Login />", () => {
   });
 
   it("displays password validation errors", async () => {
-    const { debug, getByPlaceholderText, getByRole } = renderResults;
-    const password = getByPlaceholderText("패스워드");
+    const { getByPlaceholderText, getByRole, debug } = renderResults;
+    const email = getByPlaceholderText("이메일");
+    const submitBtn = getByRole("button");
+
     await waitFor(() => {
-      userEvent.type(password, "1");
-      userEvent.clear(password);
+      userEvent.type(email, "fake@email.com");
+      userEvent.click(submitBtn);
     });
     errorMessage = getByRole("alert");
     expect(errorMessage).toHaveTextContent("패스워드가 필요합니다");
+  });
+
+  it("submits form and calls mutation", async () => {
+    const { getByPlaceholderText, getByRole, debug } = renderResults;
+    const email = getByPlaceholderText("이메일");
+    const password = getByPlaceholderText("패스워드");
+    const submitBtn = getByRole("button");
+
+    const formData = {
+      email: "real@test.com",
+      password: "1234",
+    };
+    const mockedMutationResponse = jest.fn().mockResolvedValue({
+      data: {
+        login: {
+          ok: true,
+          token: "xxx",
+          error: null,
+        },
+      },
+    });
+    mockedClient.setRequestHandler(LOGIN_MUTATION, mockedMutationResponse);
+    await waitFor(() => {
+      userEvent.type(email, formData.email);
+      userEvent.type(password, formData.password);
+      userEvent.click(submitBtn);
+    });
+    expect(mockedMutationResponse).toHaveBeenCalledTimes(1);
+    expect(mockedMutationResponse).toHaveBeenCalledWith({
+      loginInput: {
+        email: formData.email,
+        password: formData.password,
+      },
+    });
   });
 });

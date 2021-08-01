@@ -48,11 +48,12 @@ export const Header: React.FC = () => {
               </Link>
             </span>
             <span>
-              <FontAwesomeIcon
-                icon={faSignOutAlt}
-                className="text-xl cursor-pointer"
-                onClick={onClick}
-              />
+              <Link onClick={onClick} to={routes.home} role="button">
+                <FontAwesomeIcon
+                  icon={faSignOutAlt}
+                  className="text-xl cursor-pointer"
+                />
+              </Link>
             </span>
           </div>
         </div>

@@ -82,5 +82,9 @@ describe("<Header />", () => {
         </Router>
       </MockedProvider>
     );
+    const btn = getByRole("button");
+    await waitFor(() => {
+      userEvent.click(btn);
+    });
   });
 });

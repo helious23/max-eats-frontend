@@ -13,7 +13,7 @@ import routes from "../routes";
 import { PageTitle } from "../components/page-title";
 import { Logo } from "./logo";
 
-const LOGIN_MUTATION = gql`
+export const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
     login(input: $loginInput) {
       ok
