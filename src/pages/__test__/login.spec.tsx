@@ -89,7 +89,7 @@ describe("<Login />", () => {
         password: formData.password,
       },
     });
-    const errorMessage = getByRole("alert");
+    errorMessage = getByRole("alert");
     expect(errorMessage).toHaveTextContent("mutation-error");
     expect(localStorage.setItem).toHaveBeenCalledWith("maxeats-token", "xxx");
   });
