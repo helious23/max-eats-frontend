@@ -22,14 +22,32 @@ describe("Create Account", () => {
     user.findByRole("alert").should("have.text", "사용중인 이메일 입니다");
   });
   it("should can create account and login", () => {
+    user.intercept("http://localhost:4000/graphql", (req) => {
+      const { operationName } = req.body;
+      if (operationName === "createAccountMutation") {
+        req.reply((res) => {
+          res.send({
+            data: {
+              createAccount: {
+                ok: true,
+                error: null,
+                __typename: "CreateAccountOutput",
+              },
+            },
+          });
+        });
+      }
+    });
     user.visit(routes.createAccount);
-    user.findByPlaceholderText("이메일").type("max@gmail.com");
+    user.findByPlaceholderText("이메일").type("jenny@gmail.com");
     user.findByPlaceholderText("패스워드").type("121212");
     user.findByRole("button").click();
-    user.wait(5000);
+    user.wait(3000);
+    user.title().should("eq", "로그인 | Max Eats");
     user
       .findByRole("alert")
       .should("have.text", "계정이 생성되었습니다. 로그인 하세요.");
+
     user.findByRole("button").click();
     user.window().its("localStorage.maxeats-token").should("be.a", "string");
   });
