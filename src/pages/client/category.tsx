@@ -49,7 +49,6 @@ export const Category = () => {
       },
     }
   );
-
   const onNextPageClick = () => setPage((current) => current + 1);
   const onPrevPageClick = () => setPage((current) => current - 1);
 

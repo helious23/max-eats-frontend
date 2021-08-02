@@ -98,7 +98,7 @@ describe("<Header />", () => {
         </Router>
       </MockedProvider>
     );
-    const btn = getByRole("button");
+    const btn = getByRole("navigation");
     await waitFor(() => {
       userEvent.click(btn);
     });

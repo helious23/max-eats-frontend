@@ -18,7 +18,7 @@ import {
 import routes from "../../routes";
 import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragment";
 
-const RESTAURANTS_QUERY = gql`
+export const RESTAURANTS_QUERY = gql`
   query restaurantsPageQuery($input: RestaurantsInput!) {
     allCategories {
       ok
@@ -53,7 +53,7 @@ export const Restaurants: React.FC = () => {
       },
     },
   });
-
+  console.log(data);
   interface IFormProps {
     searchTerm: string;
   }

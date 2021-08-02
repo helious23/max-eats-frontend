@@ -1,3 +1,5 @@
+import routes from "../../../src/routes";
+
 describe("Edit Profile", () => {
   const user = cy;
 
@@ -5,7 +7,7 @@ describe("Edit Profile", () => {
     user.login("jenny@gmail.com", "121212");
   });
 
-  it("can go to /edit-profile using the header", () => {
+  it("can go to /edit-profile using the header icon", () => {
     user.get('a[href="/edit-profile"]').click();
     user.assertTitle("프로필 수정");
   });
@@ -23,8 +25,22 @@ describe("Edit Profile", () => {
         });
       }
     });
-    user.visit("/edit-profile");
+    user.visit(routes.editProfile);
     user.findByPlaceholderText("이메일").clear().type("new@email.com");
-    user.get(".text-white").click();
+    user.findByRole("button").click();
+  });
+
+  it("can change password", () => {
+    user.intercept("POST", "http://localhost:4000/graphql", (req) => {
+      const { operationName } = req.body;
+      if (operationName === "editProfile") {
+        // @ts-ignore
+        req.body?.variables?.input?.password = "121212";
+      }
+    });
+    user.visit(routes.editProfile);
+    user.findByPlaceholderText("이메일").clear();
+    user.findAllByPlaceholderText("패스워드").type("new-password");
+    user.findByRole("button").click();
   });
 });
