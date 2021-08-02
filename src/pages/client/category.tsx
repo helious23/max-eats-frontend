@@ -16,7 +16,7 @@ interface ICategoryParams {
   slug: string;
 }
 
-const CATEGORY_QUERY = gql`
+export const CATEGORY_QUERY = gql`
   query category($input: CategoryInput!) {
     category(input: $input) {
       ok
@@ -43,7 +43,7 @@ export const Category = () => {
     {
       variables: {
         input: {
-          page: 1,
+          page,
           slug: params.slug,
         },
       },
@@ -81,11 +81,14 @@ export const Category = () => {
             </div>
             <div className="grid grid-cols-3 text-center max-w-md items-center justify-center mx-auto mt-10">
               {page > 1 ? (
-                <div className="flex justify-center">
+                <div
+                  className="flex justify-center"
+                  role="button"
+                  onClick={onPrevPageClick}
+                >
                   <FontAwesomeIcon
                     icon={faChevronLeft}
                     className="focus:outline-none text-xl cursor-pointer"
-                    onClick={onPrevPageClick}
                   />
                 </div>
               ) : (
@@ -95,11 +98,14 @@ export const Category = () => {
                 Page {page} of {data?.category.totalPages}
               </span>
               {page !== data?.category.totalPages ? (
-                <div className="flex justify-center">
+                <div
+                  className="flex justify-center"
+                  onClick={onNextPageClick}
+                  role={"button"}
+                >
                   <FontAwesomeIcon
                     icon={faChevronRight}
                     className="focus:outline-none text-xl cursor-pointer"
-                    onClick={onNextPageClick}
                   />
                 </div>
               ) : (

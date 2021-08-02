@@ -5,6 +5,22 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { ME_QUERY } from "../../hooks/useMe";
 import userEvent from "@testing-library/user-event";
 
+const mockPush = jest.fn();
+
+jest.mock("react-router-dom", () => {
+  // react-router-dom 을 mock
+  const realModule = jest.requireActual("react-router-dom"); // useHistory 를 제외한 다른 fn 은 그대로 들고옴
+  return {
+    ...realModule,
+    useHistory: () => {
+      // useHistory 만 mocking
+      return {
+        push: mockPush,
+      };
+    },
+  };
+});
+
 const mockedMeQuery = {
   request: {
     query: ME_QUERY,
@@ -86,5 +102,10 @@ describe("<Header />", () => {
     await waitFor(() => {
       userEvent.click(btn);
     });
+    expect(mockPush).toHaveBeenCalledWith("/");
+  });
+
+  afterAll(() => {
+    jest.clearAllMocks();
   });
 });
