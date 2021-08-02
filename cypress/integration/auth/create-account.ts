@@ -5,6 +5,7 @@ describe("Create Account", () => {
   it("should see email / password validation errors", () => {
     user.visit(routes.home);
     user.findByText("계정 만들기").click();
+    user.assertTitle("회원 가입");
     user.findByPlaceholderText("이메일").type("bad@email");
     user
       .findByRole("alert")
@@ -44,7 +45,7 @@ describe("Create Account", () => {
     user.findByPlaceholderText("패스워드").type("121212");
     user.findByRole("button").click();
     user.wait(3000);
-    user.title().should("eq", "로그인 | Max Eats");
+    user.assertTitle("로그인");
     user
       .findByRole("status")
       .should("have.text", "계정이 생성되었습니다. 로그인 하세요.");

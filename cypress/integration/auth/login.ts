@@ -3,7 +3,7 @@ import routes from "../../../src/routes";
 describe("Log In", () => {
   const user = cy;
   it("should see login page", () => {
-    user.visit(routes.home).title().should("eq", "로그인 | Max Eats");
+    user.assertTitle("로그인");
   });
   it("can see email / password validation error", () => {
     user.visit(routes.home);

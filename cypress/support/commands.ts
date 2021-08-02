@@ -32,6 +32,7 @@ declare global {
     interface Chainable {
       assertLoggedIn(): void;
       assertLoggedOut(): void;
+      assertTitle(title: string): void;
       login(email: string, password: string): void;
     }
   }
@@ -45,10 +46,14 @@ Cypress.Commands.add("assertLoggedOut", () => {
   cy.window().its("localStorage.maxeats-token").should("be.undefined");
 });
 
+Cypress.Commands.add("assertTitle", (title) => {
+  cy.title().should("eq", `${title} | Max Eats`);
+});
+
 Cypress.Commands.add("login", (email, password) => {
   cy.assertLoggedOut();
   cy.visit(routes.home);
-  cy.title().should("eq", "로그인 | Max Eats");
+  cy.assertTitle("로그인");
   cy.findByPlaceholderText("이메일").type(email);
   cy.findByPlaceholderText("패스워드").type(password);
   cy.findByRole("button")
