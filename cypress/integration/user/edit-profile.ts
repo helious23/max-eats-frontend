@@ -6,29 +6,25 @@ describe("Edit Profile", () => {
   });
 
   it("can go to /edit-profile using the header", () => {
-    user.get('a[href="/edit-profile]').click();
+    user.get('a[href="/edit-profile"]').click();
     user.assertTitle("프로필 수정");
   });
 
   it("can change email", () => {
-    user.intercept("http://localhost:4000/graphql", (req) => {
+    user.intercept("POST", "http://localhost:4000/graphql", (req) => {
       const { operationName } = req.body;
-      if (operationName === "editProfileMutation") {
+      if (operationName === "editProfile") {
+        //@ts-ignore
+        req.body?.variables?.input?.email = "jenny@gmail.com";
         req.reply((res) => {
           res.send({
-            data: {
-              createAccount: {
-                ok: true,
-                error: null,
-                __typename: "EditProfileOutput",
-              },
-            },
+            fixture: "user/edit-profile.json",
           });
         });
       }
     });
     user.visit("/edit-profile");
     user.findByPlaceholderText("이메일").clear().type("new@email.com");
-    user.findByRole("button").click();
+    user.get(".text-white").click();
   });
 });
