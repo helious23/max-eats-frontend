@@ -9,26 +9,44 @@ import { EditProfile } from "../pages/user/edit-profile";
 import { Search } from "../pages/client/search";
 import { Category } from "../pages/client/category";
 import { RestaurantDetail } from "../pages/client/restaurant-detail";
+import { UserRole } from "../__generated__/globalTypes";
+import { MyRestaurants } from "../pages/owner/my-restaurants";
 
-const ClientRoutes = [
-  <Route key={routes.home} path={routes.home} exact>
-    <Restaurants />
-  </Route>,
-  <Route key={routes.confirmEmail} path={routes.confirmEmail}>
-    <ConfirmEmail />
-  </Route>,
-  <Route key={routes.confirmEmail} path={routes.editProfile}>
-    <EditProfile />
-  </Route>,
-  <Route key={routes.search} path={routes.search}>
-    <Search />
-  </Route>,
-  <Route key={routes.category} path={routes.category}>
-    <Category />
-  </Route>,
-  <Route key={routes.restaurant} path={routes.restaurant}>
-    <RestaurantDetail />
-  </Route>,
+const clientRoutes = [
+  {
+    path: routes.home,
+    component: <Restaurants />,
+  },
+  {
+    path: routes.search,
+    component: <Search />,
+  },
+  {
+    path: routes.category,
+    component: <Category />,
+  },
+  {
+    path: routes.restaurant,
+    component: <RestaurantDetail />,
+  },
+];
+
+const commonRoutes = [
+  {
+    path: routes.confirmEmail,
+    component: <ConfirmEmail />,
+  },
+  {
+    path: routes.editProfile,
+    component: <EditProfile />,
+  },
+];
+
+const ownerRoutes = [
+  {
+    path: routes.home,
+    component: <MyRestaurants />,
+  },
 ];
 
 export const LoggedInRouter = () => {
@@ -44,7 +62,23 @@ export const LoggedInRouter = () => {
     <Router>
       <Header />
       <Switch>
-        {data.me.role === "Client" && ClientRoutes}
+        {commonRoutes.map((route) => (
+          <Route key={route.path} path={route.path}>
+            {route.component}
+          </Route>
+        ))}
+        {data.me.role === UserRole.Client &&
+          clientRoutes.map((route) => (
+            <Route key={route.path} path={route.path}>
+              {route.component}
+            </Route>
+          ))}
+        {data.me.role === UserRole.Owner &&
+          ownerRoutes.map((route) => (
+            <Route key={route.path} path={route.path}>
+              {route.component}
+            </Route>
+          ))}
         <Route>
           <NotFound />
         </Route>
