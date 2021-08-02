@@ -77,7 +77,7 @@ export const Login = () => {
         </h4>
         <div className="w-full mt-5">이메일 주소로 로그인하세요</div>
         <div
-          role="alert"
+          role="status"
           className={`${
             location.state?.message ? "text-lime-600 mt-5 font-medium" : ""
           }`}

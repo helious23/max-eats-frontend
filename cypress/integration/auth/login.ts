@@ -1,4 +1,5 @@
 import routes from "../../../src/routes";
+
 describe("Log In", () => {
   const user = cy;
   it("should see login page", () => {
@@ -16,14 +17,8 @@ describe("Log In", () => {
     user.findByPlaceholderText("패스워드").type("something").clear();
     user.findByRole("alert").should("have.text", "패스워드가 필요합니다");
   });
+
   it("can fill out the form and log in", () => {
-    user.visit(routes.home);
-    user.findByPlaceholderText("이메일").type("jenny@gmail.com");
-    user.findByPlaceholderText("패스워드").type("121212");
-    user
-      .findByRole("button")
-      .should("not.have.class", "pointer-events-none")
-      .click();
-    user.window().its("localStorage.maxeats-token").should("be.a", "string");
+    user.login("jenny@gmail.com", "121212");
   });
 });

@@ -21,6 +21,7 @@ describe("Create Account", () => {
       .click();
     user.findByRole("alert").should("have.text", "사용중인 이메일 입니다");
   });
+
   it("should can create account and login", () => {
     user.intercept("http://localhost:4000/graphql", (req) => {
       const { operationName } = req.body;
@@ -45,10 +46,10 @@ describe("Create Account", () => {
     user.wait(3000);
     user.title().should("eq", "로그인 | Max Eats");
     user
-      .findByRole("alert")
+      .findByRole("status")
       .should("have.text", "계정이 생성되었습니다. 로그인 하세요.");
 
     user.findByRole("button").click();
-    user.window().its("localStorage.maxeats-token").should("be.a", "string");
+    user.assertLoggedIn();
   });
 });
