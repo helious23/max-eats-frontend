@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useApolloClient } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { Button } from "../../components/button";
 import { PageTitle } from "../../components/page-title";
@@ -8,6 +8,9 @@ import {
   createRestaurantVariables,
 } from "../../__generated__/createRestaurant";
 import { FormError } from "../../components/form-error";
+import { MY_RESTAURANTS_QUERY } from "./my-restaurants";
+import { useHistory } from "react-router-dom";
+import routes from "../../routes";
 
 const CREATE_RESTAURANT_MUTATION = gql`
   mutation createRestaurant($input: CreateRestaurantInput!) {
@@ -27,13 +30,56 @@ interface IFormProps {
 }
 
 export const AddRestaurant = () => {
+  const client = useApolloClient();
+  const history = useHistory();
+  const [imageUrl, setImageUrl] = useState("");
+  const { register, formState, handleSubmit, getValues } = useForm<IFormProps>({
+    mode: "onChange",
+  });
+
   const onCompleted = (data: createRestaurant) => {
     const {
       createRestaurant: { ok, restaurantId },
     } = data;
     if (ok) {
+      const { name, categoryName, address } = getValues();
       setUploading(false);
-      // fake
+      const queryResult = client.readQuery({
+        query: MY_RESTAURANTS_QUERY,
+        variables: { input: { page: 1 } },
+      }); // page 1 의 cache data 읽음
+      console.log(queryResult);
+      client.writeQuery({
+        query: MY_RESTAURANTS_QUERY,
+        variables: { input: { page: 1 } },
+        data: {
+          myRestaurants: {
+            ...queryResult.myRestaurants, // 기존 cache 에 있는 data
+            totalResults: queryResult.myRestaurants?.totalResults + 1,
+            totalPages: Math.ceil(
+              (queryResult.myRestaurants?.totalResults + 1) / 9
+            ),
+            restaurants: [
+              {
+                address,
+                category: {
+                  name: categoryName,
+                  slug: categoryName.replace(/ +/g, "-"),
+                  __typename: "Category",
+                },
+                coverImg: imageUrl,
+                id: restaurantId,
+                isPromoted: false,
+                name,
+                __typename: "Restaurant",
+              },
+              ...queryResult.myRestaurants.restaurants,
+            ],
+          },
+        },
+      });
+      alert("식당이 등록 되었습니다");
+      history.push(routes.home);
     }
   };
 
@@ -46,10 +92,6 @@ export const AddRestaurant = () => {
     );
 
   const [uploading, setUploading] = useState(false);
-
-  const { register, formState, handleSubmit } = useForm<IFormProps>({
-    mode: "onChange",
-  });
 
   const onSubmit = async (data: IFormProps) => {
     try {
@@ -64,6 +106,7 @@ export const AddRestaurant = () => {
           body: formBody,
         })
       ).json();
+      setImageUrl(coverImg);
       createRestaurantMutation({
         variables: {
           input: {

@@ -1,6 +1,6 @@
-import { gql, useQuery, useApolloClient } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { RESTAURANT_FRAGMENT } from "../../fragment";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Restaurant } from "../../components/restaurant";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -41,22 +41,6 @@ export const MyRestaurants = () => {
       },
     }
   );
-  const client = useApolloClient();
-  useEffect(() => {
-    const queryResult = client.readQuery({
-      query: MY_RESTAURANTS_QUERY,
-      variables: { input: { page } },
-    }); // page 1 의 cache data 읽음
-    client.writeQuery({
-      query: MY_RESTAURANTS_QUERY,
-      variables: { input: { page } },
-      data: {
-        ...queryResult,
-        restaurants: {},
-      },
-    });
-  }, [client, page]);
-
   const onNextPageClick = () => setPage((current) => current + 1);
   const onPrevPageClick = () => setPage((current) => current - 1);
 
