@@ -14,6 +14,7 @@ const CREATE_RESTAURANT_MUTATION = gql`
     createRestaurant(input: $input) {
       ok
       error
+      restaurantId
     }
   }
 `;
@@ -28,10 +29,11 @@ interface IFormProps {
 export const AddRestaurant = () => {
   const onCompleted = (data: createRestaurant) => {
     const {
-      createRestaurant: { ok },
+      createRestaurant: { ok, restaurantId },
     } = data;
     if (ok) {
       setUploading(false);
+      // fake
     }
   };
 

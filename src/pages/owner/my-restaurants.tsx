@@ -1,7 +1,6 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useApolloClient } from "@apollo/client";
 import { RESTAURANT_FRAGMENT } from "../../fragment";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Restaurant } from "../../components/restaurant";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,7 +14,7 @@ import {
 import { NoRestaurants } from "./no-restaurants";
 import { PageTitle } from "../../components/page-title";
 
-const MY_RESTAURANT_QUERY = gql`
+export const MY_RESTAURANTS_QUERY = gql`
   query myRestaurants($input: MyRestaurantsInput!) {
     myRestaurants(input: $input) {
       ok
@@ -33,7 +32,7 @@ const MY_RESTAURANT_QUERY = gql`
 export const MyRestaurants = () => {
   const [page, setPage] = useState(1);
   const { data, loading } = useQuery<myRestaurants, myRestaurantsVariables>(
-    MY_RESTAURANT_QUERY,
+    MY_RESTAURANTS_QUERY,
     {
       variables: {
         input: {
@@ -42,6 +41,21 @@ export const MyRestaurants = () => {
       },
     }
   );
+  const client = useApolloClient();
+  useEffect(() => {
+    const queryResult = client.readQuery({
+      query: MY_RESTAURANTS_QUERY,
+      variables: { input: { page } },
+    }); // page 1 의 cache data 읽음
+    client.writeQuery({
+      query: MY_RESTAURANTS_QUERY,
+      variables: { input: { page } },
+      data: {
+        ...queryResult,
+        restaurants: {},
+      },
+    });
+  }, [client, page]);
 
   const onNextPageClick = () => setPage((current) => current + 1);
   const onPrevPageClick = () => setPage((current) => current - 1);
@@ -49,10 +63,9 @@ export const MyRestaurants = () => {
   return (
     <div>
       <PageTitle title={"등록된 식당"} />
-      {data?.myRestaurants.ok &&
-        data.myRestaurants.restaurants.length === 0 && <NoRestaurants />}
-      {data?.myRestaurants.ok &&
-        data.myRestaurants.restaurants.length !== 0 &&
+      {data?.myRestaurants.ok && data.myRestaurants.restaurants.length === 0 ? (
+        <NoRestaurants />
+      ) : (
         !loading && (
           <div className="container">
             <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
@@ -94,7 +107,8 @@ export const MyRestaurants = () => {
               )}
             </div>
           </div>
-        )}
+        )
+      )}
     </div>
   );
 };
