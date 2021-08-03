@@ -53,7 +53,6 @@ export const Restaurants: React.FC = () => {
       },
     },
   });
-  console.log(data);
   interface IFormProps {
     searchTerm: string;
   }
@@ -96,7 +95,7 @@ export const Restaurants: React.FC = () => {
         )}
       </form>
       {!loading && (
-        <div className="max-w-screen-xl mx-auto mt-8 pb-20">
+        <div className="container">
           <div className="flex justify-start max-w-md overflow-hidden md:justify-around md:max-w-3xl mx-auto">
             {data?.allCategories.categories?.map((category) => (
               <Categories

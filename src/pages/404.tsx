@@ -9,7 +9,7 @@ export const NotFound: React.FC = () => (
     <h4 className="font-medium text-base mb-5">
       페이지가 존재하지 않거나 이동했습니다.
     </h4>
-    <Link className="hover:underline text-lime-600" to={routes.home}>
+    <Link className="link" to={routes.home}>
       홈 화면으로 돌아가기 &rarr;
     </Link>
   </div>

@@ -6,6 +6,7 @@ const routes = {
   search: "/search",
   category: "/category/:slug",
   restaurant: "/restaurant/:id",
+  addRestaurant: "/add-restaurant",
 };
 
 export default routes;

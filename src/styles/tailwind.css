@@ -3,5 +3,13 @@
 @tailwind utilities;
 
 .input {
-    @apply focus:outline-none p-2 border text-lg font-light border-gray-200 transition-colors
+    @apply focus:outline-none p-2 border text-lg font-light border-gray-200 transition-colors;
+}
+
+.container {
+    @apply max-w-screen-xl mx-auto mt-8 pb-20;
+}
+
+.link {
+    @apply hover:underline text-lime-600;
 }

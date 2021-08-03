@@ -11,6 +11,7 @@ import { Category } from "../pages/client/category";
 import { RestaurantDetail } from "../pages/client/restaurant-detail";
 import { UserRole } from "../__generated__/globalTypes";
 import { MyRestaurants } from "../pages/owner/my-restaurants";
+import { AddRestaurant } from "../pages/owner/add-restaurant";
 
 const clientRoutes = [
   {
@@ -47,6 +48,10 @@ const ownerRoutes = [
     path: routes.home,
     component: <MyRestaurants />,
   },
+  {
+    path: routes.addRestaurant,
+    component: <AddRestaurant />,
+  },
 ];
 
 export const LoggedInRouter = () => {
@@ -63,19 +68,19 @@ export const LoggedInRouter = () => {
       <Header />
       <Switch>
         {commonRoutes.map((route) => (
-          <Route key={route.path} path={route.path}>
+          <Route key={route.path} path={route.path} exact>
             {route.component}
           </Route>
         ))}
         {data.me.role === UserRole.Client &&
           clientRoutes.map((route) => (
-            <Route key={route.path} path={route.path}>
+            <Route key={route.path} path={route.path} exact>
               {route.component}
             </Route>
           ))}
         {data.me.role === UserRole.Owner &&
           ownerRoutes.map((route) => (
-            <Route key={route.path} path={route.path}>
+            <Route key={route.path} path={route.path} exact>
               {route.component}
             </Route>
           ))}
