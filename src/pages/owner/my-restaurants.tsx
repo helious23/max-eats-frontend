@@ -47,21 +47,24 @@ export const MyRestaurants = () => {
   return (
     <div>
       <PageTitle title={"등록된 식당"} />
-      {data?.myRestaurants.ok && data.myRestaurants.restaurants.length === 0 ? (
+      {data?.myRestaurants.ok &&
+      data.myRestaurants.restaurants &&
+      data.myRestaurants.restaurants.length === 0 ? (
         <NoRestaurants />
       ) : (
         !loading && (
           <div className="container">
             <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
-              {data?.myRestaurants.restaurants.map((restaurant) => (
-                <Restaurant
-                  key={restaurant.id}
-                  id={restaurant.id}
-                  name={restaurant.name}
-                  coverImg={restaurant.coverImg}
-                  categoryName={restaurant.category?.name}
-                />
-              ))}
+              {data?.myRestaurants.restaurants &&
+                data?.myRestaurants.restaurants.map((restaurant) => (
+                  <Restaurant
+                    key={restaurant.id}
+                    id={restaurant.id}
+                    name={restaurant.name}
+                    coverImg={restaurant.coverImg}
+                    categoryName={restaurant.category?.name}
+                  />
+                ))}
             </div>
             <div className="grid grid-cols-3 text-center max-w-md items-center justify-center mx-auto mt-10">
               {page > 1 ? (

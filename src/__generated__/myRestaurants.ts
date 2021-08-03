@@ -31,7 +31,7 @@ export interface myRestaurants_myRestaurants {
   error: string | null;
   totalPages: number | null;
   totalResults: number | null;
-  restaurants: myRestaurants_myRestaurants_restaurants[];
+  restaurants: myRestaurants_myRestaurants_restaurants[] | null;
 }
 
 export interface myRestaurants {
