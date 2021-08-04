@@ -40,7 +40,7 @@ export const MyRestaurant = () => {
       },
     }
   );
-  console.log(data);
+
   return (
     <div>
       <PageTitle title={data?.myRestaurant.restaurant?.name || "나의 식당"} />

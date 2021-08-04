@@ -23,21 +23,24 @@ const CREATE_DISH_MUTATION = gql`
 `;
 
 interface IParams {
-  id: string;
+  restaurantId: string;
 }
 
 interface IForm {
   name: string;
   price: string;
   description: string;
+  [ksy: string]: string;
 }
 
 export const AddDish = () => {
-  const { id } = useParams<IParams>();
+  const { restaurantId } = useParams<IParams>();
   const history = useHistory();
-  const { register, handleSubmit, formState, setValue } = useForm<IForm>({
-    mode: "onChange",
-  });
+  const [optionsNumber, setOptionsNumber] = useState<number[]>([]);
+  const { register, handleSubmit, formState, setValue, getValues } =
+    useForm<IForm>({
+      mode: "onChange",
+    });
 
   const onCompleted = (data: createDish) => {
     const {
@@ -53,36 +56,41 @@ export const AddDish = () => {
     createDishVariables
   >(CREATE_DISH_MUTATION, {
     refetchQueries: [
-      { query: MY_RESTAURANT_QUERY, variables: { input: { id: +id } } },
+      {
+        query: MY_RESTAURANT_QUERY,
+        variables: { input: { id: +restaurantId } },
+      },
     ],
-    // onCompleted,
+    onCompleted,
   });
 
-  const onSubmit = (data: IForm) => {
-    const { name, price, description, ...rest } = data;
-    console.log(rest);
-    // createDishMutation({
-    //   variables: {
-    //     input: {
-    //       name,
-    //       price: +price,
-    //       description,
-    //       resturantId: +id,
-    //     },
-    //   },
-    // });
+  const onSubmit = () => {
+    const { name, price, description, ...rest } = getValues();
+    const optionOnjects = optionsNumber.map((theId) => ({
+      name: rest[`${theId}-optionName`],
+      extra: +rest[`${theId}-optionExtra`],
+    }));
+
+    createDishMutation({
+      variables: {
+        input: {
+          name,
+          price: +price,
+          description,
+          resturantId: +restaurantId,
+          options: optionOnjects,
+        },
+      },
+    });
   };
 
-  const [optionsNumber, setOptionsNumber] = useState(0);
   const onAddOptionClick = () => {
-    setOptionsNumber((current) => current + 1);
+    setOptionsNumber((current) => [Date.now(), ...current]);
   };
 
   const onDeleteClick = (idToDelete: number) => {
-    setOptionsNumber((current) => current - 1);
-    //@ts-ignore
+    setOptionsNumber((current) => current.filter((id) => id !== idToDelete));
     setValue(`${idToDelete}-optionName`, "");
-    //@ts-ignore
     setValue(`${idToDelete}-optionExtra`, "");
   };
 
@@ -132,19 +140,17 @@ export const AddDish = () => {
           >
             옵션 추가하기
           </span>
-          {optionsNumber !== 0 &&
-            Array.from(new Array(optionsNumber)).map((_, index) => (
-              <div key={index} className="mt-5">
+          {optionsNumber.length !== 0 &&
+            optionsNumber.map((id) => (
+              <div key={id} className="mt-5">
                 <input
-                  // @ts-ignore
-                  {...register(`${index}-optionName`)}
+                  {...register(`${id}-optionName`)}
                   className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2 mr-3"
                   type="text"
                   placeholder="옵션 이름"
                 />
                 <input
-                  //@ts-ignore
-                  {...register(`${index}-optionExtra`)}
+                  {...register(`${id}-optionExtra`)}
                   className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2 mr-3"
                   type="number"
                   min={0}
@@ -152,7 +158,7 @@ export const AddDish = () => {
                 />
                 <span
                   className="text-gray-300 hover:text-black cursor-pointer"
-                  onClick={() => onDeleteClick(index)}
+                  onClick={() => onDeleteClick(id)}
                 >
                   <FontAwesomeIcon icon={faTrashAlt} />
                 </span>

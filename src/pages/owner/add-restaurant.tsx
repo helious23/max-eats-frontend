@@ -32,6 +32,7 @@ interface IFormProps {
 export const AddRestaurant = () => {
   const client = useApolloClient();
   const history = useHistory();
+  const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const { register, formState, handleSubmit, getValues } = useForm<IFormProps>({
     mode: "onChange",
@@ -90,8 +91,6 @@ export const AddRestaurant = () => {
         onCompleted,
       }
     );
-
-  const [uploading, setUploading] = useState(false);
 
   const onSubmit = async (data: IFormProps) => {
     try {

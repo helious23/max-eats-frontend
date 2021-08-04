@@ -7,7 +7,7 @@ const routes = {
   category: "/category/:slug",
   restaurant: "/restaurant/:id",
   addRestaurant: "/add-restaurant",
-  addDish: "/restaurant/:id/add-dish",
+  addDish: "/restaurant/:restaurantId/add-dish",
 };
 
 export default routes;
