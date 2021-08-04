@@ -7,7 +7,7 @@ import {
 } from "../../__generated__/myRestaurant";
 import { PageTitle } from "../../components/page-title";
 
-const MY_RESTAURANT_QUERY = gql`
+export const MY_RESTAURANT_QUERY = gql`
   query myRestaurant($input: MyRestaurantInput!) {
     myRestaurant(input: $input) {
       ok
@@ -51,9 +51,9 @@ export const MyRestaurant = () => {
         }}
       ></div>
       <div className="container mt-10">
-        <div className="text-4xl font-medium mb-10">
+        <h2 className="text-4xl font-medium mb-10">
           {data?.myRestaurant.restaurant?.name || "Loading..."}
-        </div>
+        </h2>
         <Link
           to={`/restaurant/${data?.myRestaurant.restaurant?.id}/add-dish`}
           className="bg-gray-800 text-white py-3 px-10 mr-10 hover:text-lime-500 hover:opacity-80"
@@ -77,7 +77,7 @@ export const MyRestaurant = () => {
               </h4>
             </div>
           ) : (
-            {}
+            data?.myRestaurant.restaurant?.menu.map((dish) => dish.name)
           )}
         </div>
       </div>

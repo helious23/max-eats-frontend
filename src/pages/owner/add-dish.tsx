@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
 import {
   createDish,
@@ -8,9 +8,10 @@ import { PageTitle } from "../../components/page-title";
 import { useForm } from "react-hook-form";
 import { Button } from "../../components/button";
 import { FormError } from "../../components/form-error";
+import { MY_RESTAURANT_QUERY } from "./my-restaurant";
 
 const CREATE_DISH_MUTATION = gql`
-  mutation createDish($input: CreateDishInput) {
+  mutation createDish($input: CreateDishInput!) {
     createDish(input: $input) {
       ok
       error
@@ -30,22 +31,48 @@ interface IForm {
 
 export const AddDish = () => {
   const { id } = useParams<IParams>();
-  const { register, handleSubmit, formState, getValues } = useForm<IForm>({
+  const history = useHistory();
+  const { register, handleSubmit, formState } = useForm<IForm>({
     mode: "onChange",
   });
+
+  const onCompleted = (data: createDish) => {
+    const {
+      createDish: { ok },
+    } = data;
+    if (ok) {
+      alert("메뉴가 생성되었습니다");
+      history.goBack();
+    }
+  };
   const [createDishMutation, { data: createDishResult, loading }] = useMutation<
     createDish,
     createDishVariables
-  >(CREATE_DISH_MUTATION);
+  >(CREATE_DISH_MUTATION, {
+    refetchQueries: [
+      { query: MY_RESTAURANT_QUERY, variables: { input: { id: +id } } },
+    ],
+    onCompleted,
+  });
 
-  const onSubmit = () => {
-    console.log(getValues());
+  const onSubmit = (data: IForm) => {
+    const { name, price, description } = data;
+    createDishMutation({
+      variables: {
+        input: {
+          name,
+          price: +price,
+          description,
+          resturantId: +id,
+        },
+      },
+    });
   };
 
   return (
     <div className="container flex flex-col items-center mt-52">
       <PageTitle title="메뉴 추가" />
-      <h4 className="text-2xl mb-3 font-semibold">메뉴를 추가하세요</h4>
+      <h4 className="text-2xl mb-3 font-semibold">메뉴를 추가하세요 🍽</h4>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="grid max-w-screen-sm gap-3 my-5 w-full"
@@ -63,7 +90,8 @@ export const AddDish = () => {
         )}
         <input
           className="input"
-          type="price"
+          type="number"
+          min={0}
           {...register("price", { required: "가격은 필수 입력 사항입니다" })}
           placeholder="가격"
         />
@@ -84,6 +112,9 @@ export const AddDish = () => {
           canClick={formState.isValid}
           actionText="메뉴 만들기"
         />
+        {createDishResult?.createDish.error && (
+          <FormError errorMessage={createDishResult.createDish.error} />
+        )}
       </form>
     </div>
   );
