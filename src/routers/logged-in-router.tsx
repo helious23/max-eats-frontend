@@ -13,6 +13,7 @@ import { UserRole } from "../__generated__/globalTypes";
 import { MyRestaurants } from "../pages/owner/my-restaurants";
 import { AddRestaurant } from "../pages/owner/add-restaurant";
 import { MyRestaurant } from "../pages/owner/my-restaurant";
+import { AddDish } from "../pages/owner/add-dish";
 
 const clientRoutes = [
   {
@@ -56,6 +57,10 @@ const ownerRoutes = [
   {
     path: routes.restaurant,
     component: <MyRestaurant />,
+  },
+  {
+    path: routes.addDish,
+    component: <AddDish />,
   },
 ];
 

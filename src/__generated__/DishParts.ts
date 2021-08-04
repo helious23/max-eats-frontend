@@ -4,28 +4,28 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: MenuParts
+// GraphQL fragment: DishParts
 // ====================================================
 
-export interface MenuParts_options_choices {
+export interface DishParts_options_choices {
   __typename: "DishChoice";
   name: string;
   extra: number | null;
 }
 
-export interface MenuParts_options {
+export interface DishParts_options {
   __typename: "DishOption";
   name: string;
-  choices: MenuParts_options_choices[] | null;
+  choices: DishParts_options_choices[] | null;
   extra: number | null;
 }
 
-export interface MenuParts {
+export interface DishParts {
   __typename: "Dish";
   id: number;
   name: string;
   price: number;
   photo: string | null;
   description: string;
-  options: MenuParts_options[] | null;
+  options: DishParts_options[] | null;
 }

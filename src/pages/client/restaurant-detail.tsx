@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
-import { MENU_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragment";
+import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragment";
 import {
   restaurant,
   restaurantVariables,
@@ -19,13 +19,13 @@ export const RESTAURANT_QUERY = gql`
       restaurant {
         ...RestaurantParts
         menu {
-          ...MenuParts
+          ...DishParts
         }
       }
     }
   }
   ${RESTAURANT_FRAGMENT}
-  ${MENU_FRAGMENT}
+  ${DISH_FRAGMENT}
 `;
 
 export const RestaurantDetail = () => {
