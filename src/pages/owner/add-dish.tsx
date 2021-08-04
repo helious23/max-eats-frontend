@@ -11,7 +11,7 @@ import { FormError } from "../../components/form-error";
 import { MY_RESTAURANT_QUERY } from "./my-restaurant";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 const CREATE_DISH_MUTATION = gql`
   mutation createDish($input: CreateDishInput!) {
@@ -37,6 +37,7 @@ export const AddDish = () => {
   const { restaurantId } = useParams<IParams>();
   const history = useHistory();
   const [optionsNumber, setOptionsNumber] = useState<number[]>([]);
+  const [choicesNumber, setChoicesNumber] = useState<number[]>([]);
   const { register, handleSubmit, formState, setValue, getValues } =
     useForm<IForm>({
       mode: "onChange",
@@ -61,27 +62,35 @@ export const AddDish = () => {
         variables: { input: { id: +restaurantId } },
       },
     ],
-    onCompleted,
+    // onCompleted,
   });
 
   const onSubmit = () => {
     const { name, price, description, ...rest } = getValues();
-    const optionOnjects = optionsNumber.map((theId) => ({
-      name: rest[`${theId}-optionName`],
-      extra: +rest[`${theId}-optionExtra`],
-    }));
 
-    createDishMutation({
-      variables: {
-        input: {
-          name,
-          price: +price,
-          description,
-          resturantId: +restaurantId,
-          options: optionOnjects,
+    const optionOnjects = optionsNumber.map((optionId) =>
+      choicesNumber.map((choiceId) => ({
+        name: rest[`${optionId}-optionName`],
+        extra: +rest[`${optionId}-optionExtra`],
+        choices: {
+          name: rest[`${optionId}-optionName-${choiceId}-choiceName`],
+          extra: +rest[`${optionId}-optionExtra-${choiceId}-choiceExtra`],
         },
-      },
-    });
+      }))
+    );
+    console.log(optionOnjects);
+
+    // createDishMutation({
+    //   variables: {
+    //     input: {
+    //       name,
+    //       price: +price,
+    //       description,
+    //       resturantId: +restaurantId,
+    //       options: optionOnjects,
+    //     },
+    //   },
+    // });
   };
 
   const onAddOptionClick = () => {
@@ -92,6 +101,16 @@ export const AddDish = () => {
     setOptionsNumber((current) => current.filter((id) => id !== idToDelete));
     setValue(`${idToDelete}-optionName`, "");
     setValue(`${idToDelete}-optionExtra`, "");
+  };
+
+  const onAddChoiceClick = () => {
+    setChoicesNumber((current) => [Date.now(), ...current]);
+  };
+
+  const onDeleteChoiceClick = (optionId: number, choiceId: number) => {
+    setChoicesNumber((current) => current.filter((id) => id !== choiceId));
+    setValue(`${optionId}-optionName-${choiceId}-choiceName`, "");
+    setValue(`${optionId}-optionExtra-${choiceId}-choiceExtra`, "");
   };
 
   return (
@@ -151,17 +170,51 @@ export const AddDish = () => {
                 />
                 <input
                   {...register(`${id}-optionExtra`)}
-                  className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2 mr-3"
+                  className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2 mr-5"
                   type="number"
                   min={0}
                   placeholder="옵션 추가 가격"
                 />
                 <span
-                  className="text-gray-300 hover:text-black cursor-pointer"
+                  className="text-gray-300 hover:text-black cursor-pointer mr-5"
                   onClick={() => onDeleteClick(id)}
                 >
                   <FontAwesomeIcon icon={faTrashAlt} />
                 </span>
+                <span
+                  className="text-gray-300 hover:text-black cursor-pointer mr-5"
+                  onClick={onAddChoiceClick}
+                >
+                  <FontAwesomeIcon icon={faPlus} />
+                </span>
+
+                {choicesNumber.length !== 0 &&
+                  choicesNumber.map((choiceId) => (
+                    <div key={choiceId} className="mt-5">
+                      <span className="mx-5">추가 옵션 입력</span>
+                      <input
+                        {...register(`${id}-optionName-${choiceId}-choiceName`)}
+                        className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2 mr-3"
+                        type="text"
+                        placeholder="추가 옵션 이름"
+                      />
+                      <input
+                        {...register(
+                          `${id}-optionExtra-${choiceId}-choiceExtra`
+                        )}
+                        className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2 mr-5"
+                        type="number"
+                        min={0}
+                        placeholder="추가 옵션 가격"
+                      />
+                      <span
+                        className="text-gray-300 hover:text-black cursor-pointer"
+                        onClick={() => onDeleteChoiceClick(id, choiceId)}
+                      >
+                        <FontAwesomeIcon icon={faTrashAlt} />
+                      </span>
+                    </div>
+                  ))}
               </div>
             ))}
         </div>
