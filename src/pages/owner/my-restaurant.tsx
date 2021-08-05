@@ -6,6 +6,7 @@ import {
   myRestaurantVariables,
 } from "../../__generated__/myRestaurant";
 import { PageTitle } from "../../components/page-title";
+import { Dish } from "../../components/dish";
 
 export const MY_RESTAURANT_QUERY = gql`
   query myRestaurant($input: MyRestaurantInput!) {
@@ -50,7 +51,7 @@ export const MyRestaurant = () => {
           backgroundImage: `url(${data?.myRestaurant.restaurant?.coverImg})`,
         }}
       ></div>
-      <div className="container mt-10">
+      <div className="max-w-screen-2xl mx-auto pb-20 mt-10">
         <h2 className="text-4xl font-medium mb-10">
           {data?.myRestaurant.restaurant?.name || "Loading..."}
         </h2>
@@ -77,7 +78,16 @@ export const MyRestaurant = () => {
               </h4>
             </div>
           ) : (
-            data?.myRestaurant.restaurant?.menu.map((dish) => dish.name)
+            <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
+              {data?.myRestaurant.restaurant?.menu.map((dish) => (
+                <Dish
+                  name={dish.name}
+                  description={dish.description}
+                  price={dish.price}
+                  photo={dish.photo}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>
