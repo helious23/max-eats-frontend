@@ -36,8 +36,10 @@ interface IForm {
 export const AddDish = () => {
   const { restaurantId } = useParams<IParams>();
   const history = useHistory();
-  const [optionsNumber, setOptionsNumber] = useState<number[]>([]);
-  const [choicesNumber, setChoicesNumber] = useState<number[]>([]);
+  const [options, setOptions] = useState<{ id: number; choices: number[] }[]>(
+    []
+  );
+
   const { register, handleSubmit, formState, setValue, getValues } =
     useForm<IForm>({
       mode: "onChange",
@@ -62,55 +64,82 @@ export const AddDish = () => {
         variables: { input: { id: +restaurantId } },
       },
     ],
-    // onCompleted,
+    onCompleted,
   });
 
   const onSubmit = () => {
     const { name, price, description, ...rest } = getValues();
 
-    const optionOnjects = optionsNumber.map((optionId) =>
-      choicesNumber.map((choiceId) => ({
-        name: rest[`${optionId}-optionName`],
-        extra: +rest[`${optionId}-optionExtra`],
-        choices: {
-          name: rest[`${optionId}-optionName-${choiceId}-choiceName`],
-          extra: +rest[`${optionId}-optionExtra-${choiceId}-choiceExtra`],
-        },
-      }))
-    );
-    console.log(optionOnjects);
+    const optionObject = options.map((option) => ({
+      name: rest[`${option.id}-optionName`],
+      extra: +rest[`${option.id}-optionExtra`],
+      choices: option.choices.map((choice) => ({
+        name: rest[`${choice}-choiceName`],
+        extra: +rest[`${choice}-choiceExtra`],
+      })),
+    }));
 
-    // createDishMutation({
-    //   variables: {
-    //     input: {
-    //       name,
-    //       price: +price,
-    //       description,
-    //       resturantId: +restaurantId,
-    //       options: optionOnjects,
-    //     },
-    //   },
-    // });
+    createDishMutation({
+      variables: {
+        input: {
+          name,
+          price: +price,
+          description,
+          resturantId: +restaurantId,
+          options: optionObject,
+        },
+      },
+    });
   };
 
   const onAddOptionClick = () => {
-    setOptionsNumber((current) => [Date.now(), ...current]);
+    setOptions((current) => [{ id: Date.now(), choices: [] }, ...current]);
   };
 
   const onDeleteClick = (idToDelete: number) => {
-    setOptionsNumber((current) => current.filter((id) => id !== idToDelete));
+    setOptions((current) =>
+      // 삭제하는 옵션 중 choices 있다면 choices까지 전부 값 초기화
+      current
+        .map((option) => {
+          if (option.id === idToDelete) {
+            option.choices.map((choice) => {
+              setValue(`${choice}-choiceName`, "");
+              setValue(`${choice}-choiceExtra`, "");
+              return choice;
+            });
+          }
+          return option;
+        })
+        .filter((option) => option.id !== idToDelete)
+    );
     setValue(`${idToDelete}-optionName`, "");
     setValue(`${idToDelete}-optionExtra`, "");
   };
 
-  const onAddChoiceClick = () => {
-    setChoicesNumber((current) => [Date.now(), ...current]);
+  const onAddChoiceClick = (id: number) => {
+    setOptions((current) =>
+      current.map((option) => {
+        if (option.id === id) {
+          return {
+            id: option.id,
+            choices: [Date.now(), ...option.choices],
+          };
+        }
+        return option;
+      })
+    );
   };
 
-  const onDeleteChoiceClick = (optionId: number, choiceId: number) => {
-    setChoicesNumber((current) => current.filter((id) => id !== choiceId));
-    setValue(`${optionId}-optionName-${choiceId}-choiceName`, "");
-    setValue(`${optionId}-optionExtra-${choiceId}-choiceExtra`, "");
+  const onDeleteChoiceClick = (idToDelete: number) => {
+    setOptions((current) =>
+      // choices 삭제
+      current.map((option) => ({
+        id: option.id,
+        choices: option.choices.filter((choice) => choice !== idToDelete),
+      }))
+    );
+    setValue(`${idToDelete}-choiceName`, "");
+    setValue(`${idToDelete}-choiceExtra`, "");
   };
 
   return (
@@ -159,17 +188,17 @@ export const AddDish = () => {
           >
             옵션 추가하기
           </span>
-          {optionsNumber.length !== 0 &&
-            optionsNumber.map((id) => (
-              <div key={id} className="mt-5">
+          {options.length !== 0 &&
+            options.map((option) => (
+              <div key={option.id} className="mt-5">
                 <input
-                  {...register(`${id}-optionName`)}
+                  {...register(`${option.id}-optionName`)}
                   className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2 mr-3"
                   type="text"
                   placeholder="옵션 이름"
                 />
                 <input
-                  {...register(`${id}-optionExtra`)}
+                  {...register(`${option.id}-optionExtra`)}
                   className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2 mr-5"
                   type="number"
                   min={0}
@@ -177,31 +206,29 @@ export const AddDish = () => {
                 />
                 <span
                   className="text-gray-300 hover:text-black cursor-pointer mr-5"
-                  onClick={() => onDeleteClick(id)}
+                  onClick={() => onDeleteClick(option.id)}
                 >
                   <FontAwesomeIcon icon={faTrashAlt} />
                 </span>
                 <span
                   className="text-gray-300 hover:text-black cursor-pointer mr-5"
-                  onClick={onAddChoiceClick}
+                  onClick={() => onAddChoiceClick(option.id)}
                 >
                   <FontAwesomeIcon icon={faPlus} />
                 </span>
 
-                {choicesNumber.length !== 0 &&
-                  choicesNumber.map((choiceId) => (
-                    <div key={choiceId} className="mt-5">
+                {option.choices.length !== 0 &&
+                  option.choices.map((choice) => (
+                    <div key={choice} className="mt-5">
                       <span className="mx-5">추가 옵션 입력</span>
                       <input
-                        {...register(`${id}-optionName-${choiceId}-choiceName`)}
+                        {...register(`${choice}-choiceName`)}
                         className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2 mr-3"
                         type="text"
                         placeholder="추가 옵션 이름"
                       />
                       <input
-                        {...register(
-                          `${id}-optionExtra-${choiceId}-choiceExtra`
-                        )}
+                        {...register(`${choice}-choiceExtra`)}
                         className="py-2 px-4 focus:outline-none focus:border-gray-600 border-2 mr-5"
                         type="number"
                         min={0}
@@ -209,7 +236,7 @@ export const AddDish = () => {
                       />
                       <span
                         className="text-gray-300 hover:text-black cursor-pointer"
-                        onClick={() => onDeleteChoiceClick(id, choiceId)}
+                        onClick={() => onDeleteChoiceClick(choice)}
                       >
                         <FontAwesomeIcon icon={faTrashAlt} />
                       </span>

@@ -20,5 +20,5 @@ export interface createDish {
 }
 
 export interface createDishVariables {
-  input?: CreateDishInput | null;
+  input: CreateDishInput;
 }
