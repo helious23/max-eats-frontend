@@ -18,6 +18,10 @@ export interface CategoryInput {
   slug: string;
 }
 
+export interface CheckRestaurantInput {
+  name: string;
+}
+
 export interface CreateAccountInput {
   email: string;
   password: string;
@@ -27,6 +31,7 @@ export interface CreateAccountInput {
 export interface CreateDishInput {
   name: string;
   price: number;
+  photo?: string | null;
   description: string;
   options?: DishOptionInputType[] | null;
   resturantId: number;

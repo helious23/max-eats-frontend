@@ -9,6 +9,8 @@ import {
 import { Link, useHistory } from "react-router-dom";
 import routes from "../routes";
 import { logUserOut } from "../apollo";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { UserRole } from "../__generated__/globalTypes";
 
 export const Header: React.FC = () => {
   const history = useHistory();
@@ -42,6 +44,13 @@ export const Header: React.FC = () => {
             </Link>
           </div>
           <div>
+            {data?.me.role === UserRole.Owner ? (
+              <span className="text-base">
+                <Link to={routes.addRestaurant}>
+                  <FontAwesomeIcon icon={faPlus} className="text-xl mr-5" />
+                </Link>
+              </span>
+            ) : null}
             <span className="text-base">
               <Link to={routes.editProfile}>
                 <FontAwesomeIcon icon={faUser} className="text-xl mr-5" />

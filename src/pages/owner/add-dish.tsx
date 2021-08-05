@@ -40,21 +40,23 @@ export const AddDish = () => {
     []
   );
 
-  const { register, handleSubmit, formState, setValue, getValues } =
-    useForm<IForm>({
-      mode: "onChange",
-    });
+  const [uploading, setUploading] = useState(false);
+
+  const { register, handleSubmit, formState, setValue } = useForm<IForm>({
+    mode: "onChange",
+  });
 
   const onCompleted = (data: createDish) => {
     const {
       createDish: { ok },
     } = data;
     if (ok) {
+      setUploading(false);
       alert("메뉴가 생성되었습니다");
       history.goBack();
     }
   };
-  const [createDishMutation, { data: createDishResult, loading }] = useMutation<
+  const [createDishMutation, { data: createDishResult }] = useMutation<
     createDish,
     createDishVariables
   >(CREATE_DISH_MUTATION, {
@@ -67,8 +69,18 @@ export const AddDish = () => {
     onCompleted,
   });
 
-  const onSubmit = () => {
-    const { name, price, description, ...rest } = getValues();
+  const onSubmit = async (data: IForm) => {
+    setUploading(true);
+    const { file, name, price, description, ...rest } = data;
+    const actualImage = file[0];
+    const formBody = new FormData();
+    formBody.append("file", actualImage);
+    const { url: photo } = await (
+      await fetch("http://localhost:4000/uploads/", {
+        method: "POST",
+        body: formBody,
+      })
+    ).json();
 
     const optionObject = options.map((option) => ({
       name: rest[`${option.id}-optionName`],
@@ -87,6 +99,7 @@ export const AddDish = () => {
           description,
           resturantId: +restaurantId,
           options: optionObject,
+          photo,
         },
       },
     });
@@ -180,6 +193,14 @@ export const AddDish = () => {
         {formState.errors.description?.message && (
           <FormError errorMessage={formState.errors.description?.message} />
         )}
+        <div className="grid gap-3 grid-cols-2 items-center border py-2 px-2 text-lg">
+          <span className="text-gray-400"> 메뉴 사진 등록하기 </span>
+          <input
+            type="file"
+            accept="image/*"
+            {...register("file", { required: true })}
+          />
+        </div>
         <div className="my-10">
           <h4 className="font-medium mb-3 text-lg">메뉴 옵션</h4>
           <span
@@ -246,7 +267,8 @@ export const AddDish = () => {
             ))}
         </div>
         <Button
-          loading={loading}
+          loading={uploading}
+          disabled={uploading}
           canClick={formState.isValid}
           actionText="메뉴 만들기"
         />

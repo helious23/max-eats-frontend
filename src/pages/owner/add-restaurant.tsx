@@ -1,4 +1,9 @@
-import { gql, useMutation, useApolloClient } from "@apollo/client";
+import {
+  gql,
+  useMutation,
+  useApolloClient,
+  useLazyQuery,
+} from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { Button } from "../../components/button";
 import { PageTitle } from "../../components/page-title";
@@ -11,6 +16,10 @@ import { FormError } from "../../components/form-error";
 import { MY_RESTAURANTS_QUERY } from "./my-restaurants";
 import { useHistory } from "react-router-dom";
 import routes from "../../routes";
+import {
+  checkRestaurant,
+  checkRestaurantVariables,
+} from "../../__generated__/checkRestaurant";
 
 const CREATE_RESTAURANT_MUTATION = gql`
   mutation createRestaurant($input: CreateRestaurantInput!) {
@@ -18,6 +27,15 @@ const CREATE_RESTAURANT_MUTATION = gql`
       ok
       error
       restaurantId
+    }
+  }
+`;
+
+const CHECK_RESTAURANT_QUERY = gql`
+  query checkRestaurant($input: CheckRestaurantInput!) {
+    checkRestaurant(input: $input) {
+      ok
+      error
     }
   }
 `;
@@ -36,6 +54,19 @@ export const AddRestaurant = () => {
   const [imageUrl, setImageUrl] = useState("");
   const { register, formState, handleSubmit, getValues } = useForm<IFormProps>({
     mode: "onChange",
+  });
+
+  const { name } = getValues();
+
+  const [callQuery, { data: checkdata }] = useLazyQuery<
+    checkRestaurant,
+    checkRestaurantVariables
+  >(CHECK_RESTAURANT_QUERY, {
+    variables: {
+      input: {
+        name,
+      },
+    },
   });
 
   const onCompleted = (data: createRestaurant) => {
@@ -82,6 +113,7 @@ export const AddRestaurant = () => {
       alert("식당이 등록 되었습니다");
       history.push(routes.home);
     }
+    setUploading(false);
   };
 
   const [createRestaurantMutation, { data: createRestaurantResult }] =
@@ -91,6 +123,10 @@ export const AddRestaurant = () => {
         onCompleted,
       }
     );
+
+  const onCheck = () => {
+    callQuery();
+  };
 
   const onSubmit = async (data: IFormProps) => {
     try {
@@ -129,15 +165,33 @@ export const AddRestaurant = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="grid max-w-screen-sm gap-3 mt-5 w-full mb-5"
       >
-        <input
-          className="input"
-          {...register("name", {
-            required: "식당 이름은 필수 입력 사항 입니다",
-          })}
-          placeholder="식당 이름"
-          type="text"
-          required
-        />
+        <div className="flex justify-starat items-center">
+          <input
+            className="input w-5/6"
+            {...register("name", {
+              required: "식당 이름은 필수 입력 사항 입니다",
+            })}
+            placeholder="식당 이름"
+            type="text"
+            required
+          />
+          <div className="flex w-1/6 items-center justify-center">
+            <span
+              className="flex justify-center bg-lime-600 text-white py-2 px-4 cursor-pointer"
+              onClick={() => onCheck()}
+            >
+              중복 검사
+            </span>
+          </div>
+        </div>
+        {checkdata?.checkRestaurant.error && (
+          <FormError errorMessage={checkdata?.checkRestaurant.error} />
+        )}
+        {checkdata?.checkRestaurant.ok && (
+          <span role="alert" className="font-medium text-lime-600 text-center">
+            등록 가능한 식당입니다
+          </span>
+        )}
         {formState.errors.name?.message && (
           <FormError errorMessage={formState.errors.name?.message} />
         )}
@@ -165,7 +219,8 @@ export const AddRestaurant = () => {
         {formState.errors.categoryName?.message && (
           <FormError errorMessage={formState.errors.categoryName?.message} />
         )}
-        <div>
+        <div className="grid gap-3 grid-cols-2 items-center border py-2 px-2 text-lg">
+          <span className="text-gray-400"> 대표 사진 등록하기 </span>
           <input
             type="file"
             accept="image/*"
