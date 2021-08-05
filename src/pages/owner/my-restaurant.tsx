@@ -7,6 +7,7 @@ import {
 } from "../../__generated__/myRestaurant";
 import { PageTitle } from "../../components/page-title";
 import { Dish } from "../../components/dish";
+import { VictoryBar, VictoryChart, VictoryAxis } from "victory";
 
 export const MY_RESTAURANT_QUERY = gql`
   query myRestaurant($input: MyRestaurantInput!) {
@@ -89,6 +90,27 @@ export const MyRestaurant = () => {
               ))}
             </div>
           )}
+        </div>
+        <div className="mt-20 mb-10">
+          <h4 className="text-center text-2xl font-medium">Sales</h4>
+          <div className="max-w-lg w-full mx-auto">
+            <VictoryChart domainPadding={20}>
+              <VictoryAxis
+                label="주문 금액"
+                dependentAxis
+                tickValues={[20, 30, 40, 50, 60, 70, 80, 90, 100]}
+              />
+              <VictoryAxis label="일별" />
+              <VictoryBar
+                data={[
+                  { x: 10, y: 20 },
+                  { x: 20, y: 15 },
+                  { x: 30, y: 55 },
+                  { x: 40, y: 99 },
+                ]}
+              />
+            </VictoryChart>
+          </div>
         </div>
       </div>
     </div>
