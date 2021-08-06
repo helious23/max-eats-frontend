@@ -7,7 +7,7 @@ import {
 } from "../../__generated__/myRestaurant";
 import { PageTitle } from "../../components/page-title";
 import { Dish } from "../../components/dish";
-import { VictoryBar, VictoryChart, VictoryAxis } from "victory";
+import { VictoryPie } from "victory";
 
 export const MY_RESTAURANT_QUERY = gql`
   query myRestaurant($input: MyRestaurantInput!) {
@@ -42,6 +42,22 @@ export const MyRestaurant = () => {
       },
     }
   );
+
+  const chartData = [
+    { x: 1, y: 3000 },
+    { x: 2, y: 1500 },
+    { x: 3, y: 4500 },
+    { x: 4, y: 2300 },
+    { x: 5, y: 7150 },
+    { x: 6, y: 6830 },
+    { x: 7, y: 6830 },
+    { x: 8, y: 6830 },
+    { x: 9, y: 6830 },
+    { x: 10, y: 6830 },
+    { x: 11, y: 6830 },
+    { x: 12, y: 6830 },
+    { x: 13, y: 6830 },
+  ];
 
   return (
     <div>
@@ -81,12 +97,17 @@ export const MyRestaurant = () => {
           ) : (
             <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
               {data?.myRestaurant.restaurant?.menu.map((dish) => (
-                <Dish
-                  name={dish.name}
-                  description={dish.description}
-                  price={dish.price}
-                  photo={dish.photo}
-                />
+                <Link
+                  key={dish.id}
+                  to={`/restaurant/${data.myRestaurant.restaurant?.id}/edit-dish/${dish.id}`}
+                >
+                  <Dish
+                    name={dish.name}
+                    description={dish.description}
+                    price={dish.price}
+                    photo={dish.photo}
+                  />
+                </Link>
               ))}
             </div>
           )}
@@ -94,22 +115,10 @@ export const MyRestaurant = () => {
         <div className="mt-20 mb-10">
           <h4 className="text-center text-2xl font-medium">Sales</h4>
           <div className="max-w-lg w-full mx-auto">
-            <VictoryChart domainPadding={20}>
-              <VictoryAxis
-                label="주문 금액"
-                dependentAxis
-                tickValues={[20, 30, 40, 50, 60, 70, 80, 90, 100]}
-              />
-              <VictoryAxis label="일별" />
-              <VictoryBar
-                data={[
-                  { x: 10, y: 20 },
-                  { x: 20, y: 15 },
-                  { x: 30, y: 55 },
-                  { x: 40, y: 99 },
-                ]}
-              />
-            </VictoryChart>
+            <VictoryPie
+              data={chartData}
+              colorScale={["tomato", "orange", "gold", "cyan", "navy"]}
+            />
           </div>
         </div>
       </div>

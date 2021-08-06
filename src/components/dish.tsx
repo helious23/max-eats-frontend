@@ -14,7 +14,7 @@ export const Dish: React.FC<IDishProps> = ({
   photo,
 }) => {
   return (
-    <div className=" border hover:border-gray-800 transition-all grid grid-cols-3">
+    <div className=" border-2 hover:border-gray-800 transition-all grid grid-cols-3 min-h-full overflow-hidden">
       <div className="px-5 pt-4 pb-6 mb-8 col-span-2 flex flex-col h-full">
         <div className="flex flex-col items-start h-full">
           <div className="text-base font-normal">{name}</div>

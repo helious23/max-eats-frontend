@@ -170,6 +170,10 @@ export const AddRestaurant = () => {
             className="input w-5/6"
             {...register("name", {
               required: "식당 이름은 필수 입력 사항 입니다",
+              minLength: {
+                value: 2,
+                message: "식당 이름은 두글자 이상이 필요합니다",
+              },
             })}
             placeholder="식당 이름"
             type="text"
