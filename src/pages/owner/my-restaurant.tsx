@@ -1,13 +1,25 @@
 import { useParams, Link } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
-import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragment";
+import {
+  DISH_FRAGMENT,
+  ORDERS_FRAGMENT,
+  RESTAURANT_FRAGMENT,
+} from "../../fragment";
 import {
   myRestaurant,
   myRestaurantVariables,
 } from "../../__generated__/myRestaurant";
 import { PageTitle } from "../../components/page-title";
 import { Dish } from "../../components/dish";
-import { VictoryPie } from "victory";
+import { VictoryLabel, VictoryTheme } from "victory";
+import { useState } from "react";
+import {
+  getOrderAmount,
+  getOrderAmountVariables,
+} from "../../__generated__/getOrderAmount";
+import { VictoryChart, VictoryLine, VictoryAxis } from "victory";
+import { Pagination } from "../../components/pagination";
+import { NoOrders } from "./no-orders";
 
 export const MY_RESTAURANT_QUERY = gql`
   query myRestaurant($input: MyRestaurantInput!) {
@@ -19,11 +31,30 @@ export const MY_RESTAURANT_QUERY = gql`
         menu {
           ...DishParts
         }
+        orders {
+          ...OrderParts
+        }
       }
     }
   }
   ${DISH_FRAGMENT}
   ${RESTAURANT_FRAGMENT}
+  ${ORDERS_FRAGMENT}
+`;
+
+export const GET_ORDER_AMOUNT_QUERY = gql`
+  query getOrderAmount($input: GetOrderAmountInput!) {
+    getOrderAmount(input: $input) {
+      error
+      ok
+      totalPages
+      totalResults
+      orders {
+        ...OrderParts
+      }
+    }
+  }
+  ${ORDERS_FRAGMENT}
 `;
 
 interface IParams {
@@ -32,6 +63,7 @@ interface IParams {
 
 export const MyRestaurant = () => {
   const { id } = useParams<IParams>();
+  const [page, setPage] = useState(1);
   const { data } = useQuery<myRestaurant, myRestaurantVariables>(
     MY_RESTAURANT_QUERY,
     {
@@ -43,21 +75,20 @@ export const MyRestaurant = () => {
     }
   );
 
-  const chartData = [
-    { x: 1, y: 3000 },
-    { x: 2, y: 1500 },
-    { x: 3, y: 4500 },
-    { x: 4, y: 2300 },
-    { x: 5, y: 7150 },
-    { x: 6, y: 6830 },
-    { x: 7, y: 6830 },
-    { x: 8, y: 6830 },
-    { x: 9, y: 6830 },
-    { x: 10, y: 6830 },
-    { x: 11, y: 6830 },
-    { x: 12, y: 6830 },
-    { x: 13, y: 6830 },
-  ];
+  const onNextPageClick = () => setPage((current) => current + 1);
+  const onPrevPageClick = () => setPage((current) => current - 1);
+
+  const { data: orderAmountData } = useQuery<
+    getOrderAmount,
+    getOrderAmountVariables
+  >(GET_ORDER_AMOUNT_QUERY, {
+    variables: {
+      input: {
+        restaurantId: +id,
+        page,
+      },
+    },
+  });
 
   return (
     <div>
@@ -113,13 +144,65 @@ export const MyRestaurant = () => {
           )}
         </div>
         <div className="mt-20 mb-10">
-          <h4 className="text-center text-2xl font-medium">Sales</h4>
-          <div className="max-w-lg w-full mx-auto">
-            <VictoryPie
-              data={chartData}
-              colorScale={["tomato", "orange", "gold", "cyan", "navy"]}
-            />
-          </div>
+          <h4 className="text-center text-2xl font-medium">실시간 주문 현황</h4>
+          {orderAmountData?.getOrderAmount.orders?.length !== 0 ? (
+            <div className="mt-10">
+              <VictoryChart
+                theme={VictoryTheme.material}
+                height={400}
+                width={window.innerWidth}
+                domainPadding={50}
+              >
+                <VictoryLine
+                  data={orderAmountData?.getOrderAmount.orders!.map(
+                    (order) => ({
+                      x: order.createdAt,
+                      y: order.total,
+                    })
+                  )}
+                  labels={({ datum }) => `$${datum.y}`}
+                  labelComponent={
+                    <VictoryLabel
+                      style={{ fontSize: 20 }}
+                      renderInPortal
+                      dy={-20}
+                    />
+                  }
+                  animate={{
+                    duration: 500,
+                  }}
+                  interpolation={"linear"}
+                  style={{
+                    data: {
+                      stroke: "#4D7C0F",
+                      strokeWidth: 3,
+                    },
+                  }}
+                />
+
+                <VictoryAxis
+                  style={{
+                    tickLabels: {
+                      fontSize: 20,
+                    },
+                  }}
+                  tickFormat={(tick) =>
+                    `${new Date(tick).toLocaleDateString("ko")} \n ${new Date(
+                      tick
+                    ).toLocaleTimeString("ko")} `
+                  }
+                />
+              </VictoryChart>
+              <Pagination
+                onNextPageClick={onNextPageClick}
+                onPrevPageClick={onPrevPageClick}
+                page={page}
+                totalPages={orderAmountData?.getOrderAmount.totalPages!}
+              />
+            </div>
+          ) : (
+            <NoOrders id={data?.myRestaurant.restaurant?.id!} />
+          )}
         </div>
       </div>
     </div>

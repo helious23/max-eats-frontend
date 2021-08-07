@@ -4,13 +4,9 @@ import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragment";
 import { category, categoryVariables } from "../../__generated__/category";
 import { Restaurant } from "../../components/restaurant";
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
 import { PageTitle } from "../../components/page-title";
 import { Categories } from "../../components/categories";
+import { Pagination } from "../../components/pagination";
 
 interface ICategoryParams {
   slug: string;
@@ -78,39 +74,13 @@ export const Category = () => {
                 />
               ))}
             </div>
-            <div className="grid grid-cols-3 text-center max-w-md items-center justify-center mx-auto mt-10">
-              {page > 1 ? (
-                <div
-                  className="flex justify-center"
-                  role="button"
-                  onClick={onPrevPageClick}
-                >
-                  <FontAwesomeIcon
-                    icon={faChevronLeft}
-                    className="focus:outline-none text-xl cursor-pointer"
-                  />
-                </div>
-              ) : (
-                <div></div>
-              )}
-              <span className="flex justify-center">
-                Page {page} of {data?.category.totalPages}
-              </span>
-              {page !== data?.category.totalPages ? (
-                <div
-                  className="flex justify-center"
-                  onClick={onNextPageClick}
-                  role={"button"}
-                >
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    className="focus:outline-none text-xl cursor-pointer"
-                  />
-                </div>
-              ) : (
-                <div></div>
-              )}
-            </div>
+
+            <Pagination
+              onNextPageClick={onNextPageClick}
+              onPrevPageClick={onPrevPageClick}
+              page={page}
+              totalPages={data?.category.totalPages!}
+            />
           </div>
         </div>
       )}

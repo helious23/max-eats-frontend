@@ -7,16 +7,12 @@ import {
 import { Categories } from "../../components/categories";
 import { Restaurant } from "../../components/restaurant";
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from "react-hook-form";
 import { FormError } from "../../components/form-error";
 import { useHistory } from "react-router-dom";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
 import routes from "../../routes";
 import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragment";
+import { Pagination } from "../../components/pagination";
 
 export const RESTAURANTS_QUERY = gql`
   query restaurantsPageQuery($input: RestaurantsInput!) {
@@ -118,33 +114,12 @@ export const Restaurants: React.FC = () => {
               />
             ))}
           </div>
-          <div className="grid grid-cols-3 text-center max-w-md items-center justify-center mx-auto mt-10">
-            {page > 1 ? (
-              <div className="flex justify-center">
-                <FontAwesomeIcon
-                  icon={faChevronLeft}
-                  className="focus:outline-none text-xl cursor-pointer"
-                  onClick={onPrevPageClick}
-                />
-              </div>
-            ) : (
-              <div></div>
-            )}
-            <span className="flex justify-center">
-              Page {page} of {data?.restaurants.totalPages}
-            </span>
-            {page !== data?.restaurants.totalPages ? (
-              <div className="flex justify-center">
-                <FontAwesomeIcon
-                  icon={faChevronRight}
-                  className="focus:outline-none text-xl cursor-pointer"
-                  onClick={onNextPageClick}
-                />
-              </div>
-            ) : (
-              <div></div>
-            )}
-          </div>
+          <Pagination
+            onNextPageClick={onNextPageClick}
+            onPrevPageClick={onPrevPageClick}
+            page={page}
+            totalPages={data?.restaurants.totalPages!}
+          />
         </div>
       )}
     </div>

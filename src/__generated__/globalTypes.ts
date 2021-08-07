@@ -72,6 +72,11 @@ export interface EditProfileInput {
   password?: string | null;
 }
 
+export interface GetOrderAmountInput {
+  page?: number | null;
+  restaurantId: number;
+}
+
 export interface LoginInput {
   email: string;
   password: string;
