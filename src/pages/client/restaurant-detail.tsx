@@ -6,6 +6,9 @@ import {
   restaurantVariables,
 } from "../../__generated__/restaurant";
 import { PageTitle } from "../../components/page-title";
+import { Dish } from "../../components/dish";
+import { useState } from "react";
+import { DishOrder } from "../../components/dish-order";
 
 interface IRestaurantParams {
   id: string;
@@ -40,6 +43,17 @@ export const RestaurantDetail = () => {
       },
     }
   );
+  const [optionClick, setOptionClick] = useState(false);
+  const [dishId, setDishId] = useState(0);
+
+  const onDishClick = (dishId: number) => {
+    setOptionClick((current) => !current);
+    setDishId(dishId);
+  };
+
+  const onDishUnclick = () => {
+    setOptionClick((current) => !current);
+  };
 
   return (
     <div>
@@ -60,7 +74,7 @@ export const RestaurantDetail = () => {
               </h4>
             </div>
           </div>
-          <div className="pl-10 mt-6 pb-20">
+          <div className="px-10 mt-6">
             <div className="text-base font-light">
               <Link
                 className="hover:underline"
@@ -72,6 +86,31 @@ export const RestaurantDetail = () => {
             <div className="text-base mt-2 font-light">
               {data?.restaurant.restaurant?.address}
             </div>
+            <div className="w-full border-b border-gray-300 mt-6"></div>
+            <div className="mt-10 font-bold text-2xl">메뉴를 선택하세요!</div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-10 px-10 pb-20">
+            {data?.restaurant.restaurant?.menu.map((dish, index) => (
+              <div key={index}>
+                <div
+                  onClick={() => onDishClick(dish.id)}
+                  className="h-full cursor-pointer"
+                >
+                  <Dish
+                    name={dish.name}
+                    description={dish.description}
+                    price={dish.price}
+                    photo={dish.photo}
+                  />
+                </div>
+                <div className={optionClick ? "" : "hidden"}>
+                  {dish.id === dishId && (
+                    <DishOrder dish={dish} onDishUnclick={onDishUnclick} />
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
