@@ -1,20 +1,20 @@
-import {
-  restaurant_restaurant_restaurant_menu,
-  restaurant_restaurant_restaurant_menu_options_choices,
-} from "../__generated__/restaurant";
+import { restaurant_restaurant_restaurant_menu } from "../__generated__/restaurant";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
-import {
-  CreateOrderItemInput,
-  OrderItemOptionInputType,
-} from "../__generated__/globalTypes";
+import { CreateOrderItemInput } from "../__generated__/globalTypes";
 import { DishOption } from "./dish-option";
+import { useHistory } from "react-router-dom";
+import {
+  createOrder,
+  createOrderVariables,
+} from "../__generated__/createOrder";
 
 interface IDishProps {
   dish: restaurant_restaurant_restaurant_menu;
+  restaurantId: string;
   onDishUnclick: () => void;
 }
 
@@ -22,27 +22,63 @@ const CREATE_ORDER_MUTATION = gql`
   mutation createOrder($input: CreateOrderInput!) {
     createOrder(input: $input) {
       ok
+      orderId
       error
     }
   }
 `;
 
-export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
+export const DishOrder: React.FC<IDishProps> = ({
+  dish,
+  onDishUnclick,
+  restaurantId,
+}) => {
+  const histtory = useHistory();
   const [orderAmount, setOrderAmount] = useState(1);
   const [orderPrice, setOrderPrice] = useState(dish.price);
   const [orderItems, setOrderItems] = useState<CreateOrderItemInput[]>([]);
-
   const { register, handleSubmit } = useForm({
     mode: "onChange",
   });
 
-  const onClose = () => {
-    onDishUnclick();
+  const onCompleted = (data: createOrder) => {
+    const {
+      createOrder: { ok, orderId },
+    } = data;
+    if (ok) {
+      alert("주문 완료 되었습니다");
+      histtory.push(`/orders/${orderId}`);
+    }
   };
+
+  const [createOrderMutation] = useMutation<createOrder, createOrderVariables>(
+    CREATE_ORDER_MUTATION,
+    {
+      onCompleted,
+    }
+  );
 
   useEffect(() => {
     setOrderItems([{ dishId: dish.id, options: [] }]);
   }, [dish.id]);
+
+  const onSubmit = () => {
+    const ok = window.confirm("주문을 하시겠습니까?");
+    if (ok) {
+      createOrderMutation({
+        variables: {
+          input: {
+            resturantId: +restaurantId,
+            items: orderItems,
+          },
+        },
+      });
+    }
+  };
+
+  const onClose = () => {
+    onDishUnclick();
+  };
 
   const getItem = (dishId: number) => {
     return orderItems.find((order) => order.dishId === dishId);
@@ -52,22 +88,6 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
     setOrderItems((current) =>
       current.filter((dish) => dish.dishId !== dishId)
     );
-  };
-
-  const addChoiceToItem = (dishId: number, choice: any) => {
-    const oldItem = getItem(dishId);
-    if (oldItem) {
-      const hasOption = Boolean(
-        oldItem.options?.find((oldOption) => oldOption.choice === choice.choice)
-      );
-      if (!hasOption) {
-        removeFromOrder(dishId);
-        setOrderItems((current) => [
-          { dishId: dishId, options: [choice, ...oldItem.options!] },
-          ...current,
-        ]);
-      }
-    }
   };
 
   const getOptionFromItem = (
@@ -117,6 +137,22 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
     }
   };
 
+  const addChoiceToItem = (dishId: number, choice: any) => {
+    const oldItem = getItem(dishId);
+    if (oldItem) {
+      const hasOption = Boolean(
+        oldItem.options?.find((oldOption) => oldOption.choice === choice.choice)
+      );
+      if (!hasOption) {
+        removeFromOrder(dishId);
+        setOrderItems((current) => [
+          { dishId: dishId, options: [choice, ...oldItem.options!] },
+          ...current,
+        ]);
+      }
+    }
+  };
+
   const removeChoiceFromItem = (dishId: number, choiceName: string) => {
     const oldItem = getItem(dishId);
     if (oldItem) {
@@ -132,11 +168,6 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
       ]);
     }
   };
-
-  const onSubmit = () => {
-    console.log(orderItems);
-  };
-  console.log(orderItems);
 
   const onOrderPlus = () => {
     setOrderAmount((current) => current + 1);
@@ -199,6 +230,7 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
                   isOptionSelected={isOptionSelected(dish.id, option.name)}
                   removeOptionFromItem={removeOptionFromItem}
                   removeChoiceFromItem={removeChoiceFromItem}
+                  setOrderPrice={setOrderPrice}
                 />
               ))}
             </div>

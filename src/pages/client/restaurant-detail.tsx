@@ -32,13 +32,13 @@ export const RESTAURANT_QUERY = gql`
 `;
 
 export const RestaurantDetail = () => {
-  const params = useParams<IRestaurantParams>();
+  const { id } = useParams<IRestaurantParams>();
   const { data, loading } = useQuery<restaurant, restaurantVariables>(
     RESTAURANT_QUERY,
     {
       variables: {
         input: {
-          restaurantId: +params.id,
+          restaurantId: +id,
         },
       },
     }
@@ -106,7 +106,11 @@ export const RestaurantDetail = () => {
                 </div>
                 <div className={optionClick ? "" : "hidden"}>
                   {dish.id === dishId && (
-                    <DishOrder dish={dish} onDishUnclick={onDishUnclick} />
+                    <DishOrder
+                      restaurantId={id}
+                      dish={dish}
+                      onDishUnclick={onDishUnclick}
+                    />
                   )}
                 </div>
               </div>

@@ -12,6 +12,7 @@ interface IDishOptionProps {
   addChoiceToItem: (dishId: number, choice: any) => void;
   removeOptionFromItem: (dishId: number, optionName: string) => void;
   removeChoiceFromItem: (dishId: number, choiceName: string) => void;
+  setOrderPrice: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const DishOption: React.FC<IDishOptionProps> = ({
@@ -24,6 +25,7 @@ export const DishOption: React.FC<IDishOptionProps> = ({
   isOptionSelected,
   removeOptionFromItem,
   removeChoiceFromItem,
+  setOrderPrice,
 }) => {
   const getItem = (dishId: number) => {
     return orderItems.find((order) => order.dishId === dishId);
@@ -46,8 +48,14 @@ export const DishOption: React.FC<IDishOptionProps> = ({
   const onOptionClick = () => {
     if (isOptionSelected) {
       removeOptionFromItem(dishId, option.name);
+      if (option.extra !== null) {
+        setOrderPrice((current) => current - option.extra!);
+      }
     } else {
       addOptionToItem(dishId, { name: option.name });
+      if (option.extra !== null) {
+        setOrderPrice((current) => current + option.extra!);
+      }
     }
   };
 
@@ -94,11 +102,17 @@ export const DishOption: React.FC<IDishOptionProps> = ({
                 onClick={() => {
                   if (isChoiceSelected(dishId, choice.name)) {
                     removeChoiceFromItem(dishId, choice.name);
+                    if (choice.extra !== null) {
+                      setOrderPrice((current) => current - choice.extra!);
+                    }
                   } else {
                     addChoiceToItem(dishId, {
                       name: option.name,
                       choice: choice.name,
                     });
+                    if (choice.extra !== null) {
+                      setOrderPrice((current) => current + choice.extra!);
+                    }
                   }
                 }}
                 value={[option.name, choice.name]}
