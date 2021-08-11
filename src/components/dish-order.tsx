@@ -11,6 +11,7 @@ import {
   CreateOrderItemInput,
   OrderItemOptionInputType,
 } from "../__generated__/globalTypes";
+import { DishOption } from "./dish-option";
 
 interface IDishProps {
   dish: restaurant_restaurant_restaurant_menu;
@@ -26,8 +27,6 @@ const CREATE_ORDER_MUTATION = gql`
   }
 `;
 
-type IChoiceForm = { key: string; value: string };
-
 export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
   const [orderAmount, setOrderAmount] = useState(1);
   const [orderPrice, setOrderPrice] = useState(dish.price);
@@ -38,7 +37,6 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
   });
 
   const onClose = () => {
-    setOrderItems([{ dishId: dish.id, options: [] }]);
     onDishUnclick();
   };
 
@@ -56,20 +54,18 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
     );
   };
 
-  const addChoiceToItem = (choice: any) => {
-    const oldItem = getItem(dish.id);
+  const addChoiceToItem = (dishId: number, choice: any) => {
+    const oldItem = getItem(dishId);
     if (oldItem) {
       const hasOption = Boolean(
         oldItem.options?.find((oldOption) => oldOption.choice === choice.choice)
       );
       if (!hasOption) {
-        removeFromOrder(dish.id);
+        removeFromOrder(dishId);
         setOrderItems((current) => [
-          { dishId: dish.id, options: [choice, ...oldItem.options!] },
+          { dishId: dishId, options: [choice, ...oldItem.options!] },
           ...current,
         ]);
-      } else {
-        // check 해제 시 삭제
       }
     }
   };
@@ -86,23 +82,54 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
     if (item) {
       return Boolean(getOptionFromItem(item, optionName));
     }
+    return false;
   };
 
-  const addOptionToItem = (option: any) => {
-    const oldItem = getItem(dish.id);
+  const addOptionToItem = (dishId: number, option: any) => {
+    const oldItem = getItem(dishId);
     if (oldItem) {
       const hasOption = Boolean(
         oldItem.options?.find((oldOption) => oldOption.name === option.name)
       );
       if (!hasOption) {
-        removeFromOrder(dish.id);
+        removeFromOrder(dishId);
         setOrderItems((current) => [
-          { dishId: dish.id, options: [option, ...oldItem.options!] },
+          { dishId: dishId, options: [option, ...oldItem.options!] },
           ...current,
         ]);
-      } else {
-        // check 해제 시 삭제
       }
+    }
+  };
+
+  const removeOptionFromItem = (dishId: number, optionName: string) => {
+    const oldItem = getItem(dishId);
+    if (oldItem) {
+      removeFromOrder(dishId);
+      setOrderItems((current) => [
+        {
+          dishId: dish.id,
+          options: oldItem.options?.filter(
+            (option) => option.name !== optionName
+          ),
+        },
+        ...current,
+      ]);
+    }
+  };
+
+  const removeChoiceFromItem = (dishId: number, choiceName: string) => {
+    const oldItem = getItem(dishId);
+    if (oldItem) {
+      removeFromOrder(dishId);
+      setOrderItems((current) => [
+        {
+          dishId: dishId,
+          options: oldItem.options?.filter(
+            (option) => option.choice !== choiceName
+          ),
+        },
+        ...current,
+      ]);
     }
   };
 
@@ -161,69 +188,18 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
                 </div>
               </div>
               {dish.options?.map((option, index) => (
-                <div key={index}>
-                  <div className="w-full mb-10">
-                    <div className="flex items-center justify-between bg-gray-100 py-4 mb-2">
-                      <div
-                        className={`ml-6 text-lg font-semibold flex items-center ${
-                          isOptionSelected(dish.id, option.name)
-                            ? "text-lime-600"
-                            : "text-black"
-                        }`}
-                      >
-                        {option.choices?.length === 0 && (
-                          <input
-                            {...register(`${option.name}`)}
-                            type="checkbox"
-                            id={option.name}
-                            name={option.name}
-                            onClick={() =>
-                              addOptionToItem({ name: option.name })
-                            }
-                            value={[option.name]}
-                            className="mr-5"
-                          />
-                        )}
-                        <div>{option.name}</div>
-                      </div>
-                      {option.extra !== 0 && (
-                        <div className="mr-6 text-sm opacity-75">
-                          $ {option.extra}
-                        </div>
-                      )}
-                    </div>
-                    <div className="mx-6">
-                      {option.choices?.map((choice, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between"
-                        >
-                          <div className="flex items-center">
-                            <input
-                              {...register(`${choice.name}`)}
-                              type="checkbox"
-                              id={choice.name}
-                              name={choice.name}
-                              onClick={() =>
-                                addChoiceToItem({
-                                  name: option.name,
-                                  choice: choice.name,
-                                })
-                              }
-                              value={[option.name, choice.name]}
-                              className="mr-5"
-                            />
-
-                            <div className=" mt-1">{choice.name}</div>
-                          </div>
-                          <div className="text-sm opacity-75">
-                            $ {choice.extra}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <DishOption
+                  key={index}
+                  dishId={dish.id}
+                  option={option}
+                  register={register}
+                  orderItems={orderItems}
+                  addOptionToItem={addOptionToItem}
+                  addChoiceToItem={addChoiceToItem}
+                  isOptionSelected={isOptionSelected(dish.id, option.name)}
+                  removeOptionFromItem={removeOptionFromItem}
+                  removeChoiceFromItem={removeChoiceFromItem}
+                />
               ))}
             </div>
             <div className="w-full border-t border-gray-200">
