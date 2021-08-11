@@ -8,8 +8,12 @@ interface IDishOptionProps {
   orderItems: CreateOrderItemInput[];
   register: UseFormRegister<FieldValues>;
   option: restaurant_restaurant_restaurant_menu_options;
-  addOptionToItem: (dishId: number, option: any) => void;
-  addChoiceToItem: (dishId: number, choice: any) => void;
+  addOptionToItem: (dishId: number, optionName: string) => void;
+  addChoiceToItem: (
+    dishId: number,
+    optionName: string,
+    choiceName: string
+  ) => void;
   removeOptionFromItem: (dishId: number, optionName: string) => void;
   removeChoiceFromItem: (dishId: number, choiceName: string) => void;
   setOrderPrice: React.Dispatch<React.SetStateAction<number>>;
@@ -52,7 +56,7 @@ export const DishOption: React.FC<IDishOptionProps> = ({
         setOrderPrice((current) => current - option.extra!);
       }
     } else {
-      addOptionToItem(dishId, { name: option.name });
+      addOptionToItem(dishId, option.name);
       if (option.extra !== null) {
         setOrderPrice((current) => current + option.extra!);
       }
@@ -106,10 +110,7 @@ export const DishOption: React.FC<IDishOptionProps> = ({
                       setOrderPrice((current) => current - choice.extra!);
                     }
                   } else {
-                    addChoiceToItem(dishId, {
-                      name: option.name,
-                      choice: choice.name,
-                    });
+                    addChoiceToItem(dishId, option.name, choice.name);
                     if (choice.extra !== null) {
                       setOrderPrice((current) => current + choice.extra!);
                     }

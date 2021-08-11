@@ -105,16 +105,19 @@ export const DishOrder: React.FC<IDishProps> = ({
     return false;
   };
 
-  const addOptionToItem = (dishId: number, option: any) => {
+  const addOptionToItem = (dishId: number, optionName: string) => {
     const oldItem = getItem(dishId);
     if (oldItem) {
       const hasOption = Boolean(
-        oldItem.options?.find((oldOption) => oldOption.name === option.name)
+        oldItem.options?.find((oldOption) => oldOption.name === optionName)
       );
       if (!hasOption) {
         removeFromOrder(dishId);
         setOrderItems((current) => [
-          { dishId: dishId, options: [option, ...oldItem.options!] },
+          {
+            dishId: dishId,
+            options: [{ name: optionName }, ...oldItem.options!],
+          },
           ...current,
         ]);
       }
@@ -137,16 +140,26 @@ export const DishOrder: React.FC<IDishProps> = ({
     }
   };
 
-  const addChoiceToItem = (dishId: number, choice: any) => {
+  const addChoiceToItem = (
+    dishId: number,
+    optionName: string,
+    choiceName: string
+  ) => {
     const oldItem = getItem(dishId);
     if (oldItem) {
       const hasOption = Boolean(
-        oldItem.options?.find((oldOption) => oldOption.choice === choice.choice)
+        oldItem.options?.find((oldOption) => oldOption.choice === choiceName)
       );
       if (!hasOption) {
         removeFromOrder(dishId);
         setOrderItems((current) => [
-          { dishId: dishId, options: [choice, ...oldItem.options!] },
+          {
+            dishId: dishId,
+            options: [
+              { name: optionName, choice: choiceName },
+              ...oldItem.options!,
+            ],
+          },
           ...current,
         ]);
       }
