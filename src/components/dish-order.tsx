@@ -33,12 +33,12 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
   const [orderPrice, setOrderPrice] = useState(dish.price);
   const [orderItems, setOrderItems] = useState<CreateOrderItemInput[]>([]);
 
-  const { register, handleSubmit, getValues } = useForm({
+  const { register, handleSubmit } = useForm({
     mode: "onChange",
   });
 
   const onClose = () => {
-    removeFromOrder(dish.id);
+    setOrderItems([{ dishId: dish.id, options: [] }]);
     onDishUnclick();
   };
 
@@ -56,31 +56,60 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
     );
   };
 
+  const addChoiceToItem = (choice: any) => {
+    const oldItem = getItem(dish.id);
+    if (oldItem) {
+      const hasOption = Boolean(
+        oldItem.options?.find((oldOption) => oldOption.choice === choice.choice)
+      );
+      if (!hasOption) {
+        removeFromOrder(dish.id);
+        setOrderItems((current) => [
+          { dishId: dish.id, options: [choice, ...oldItem.options!] },
+          ...current,
+        ]);
+      } else {
+        // check 해제 시 삭제
+      }
+    }
+  };
+
+  const getOptionFromItem = (
+    item: CreateOrderItemInput,
+    optionName: string
+  ) => {
+    return item.options?.find((option) => option.name === optionName);
+  };
+
+  const isOptionSelected = (dishId: number, optionName: string) => {
+    const item = getItem(dishId);
+    if (item) {
+      return Boolean(getOptionFromItem(item, optionName));
+    }
+  };
+
   const addOptionToItem = (option: any) => {
     const oldItem = getItem(dish.id);
-    removeFromOrder(dish.id);
     if (oldItem) {
-      setOrderItems((current) => [
-        { dishId: dish.id, options: [option, ...oldItem.options!] },
-        ...current,
-      ]);
+      const hasOption = Boolean(
+        oldItem.options?.find((oldOption) => oldOption.name === option.name)
+      );
+      if (!hasOption) {
+        removeFromOrder(dish.id);
+        setOrderItems((current) => [
+          { dishId: dish.id, options: [option, ...oldItem.options!] },
+          ...current,
+        ]);
+      } else {
+        // check 해제 시 삭제
+      }
     }
   };
 
   const onSubmit = () => {
-    // const allOptionValue = Object.values(data);
-    // const selected = allOptionValue.filter(Boolean);
-    // const oldItem = getItem(dish.id);
-    // selected.map((option) =>
-    //   setOrderOptions((current) => [{ name: option }, ...current])
-    // );
-    // removeFromOrder(dish.id);
-    // setOrderItems((current) => [
-    //   { dishId: dish.id, options: [...orderOptions] },
-    //   ...current,
-    // ]);
     console.log(orderItems);
   };
+  console.log(orderItems);
 
   const onOrderPlus = () => {
     setOrderAmount((current) => current + 1);
@@ -135,7 +164,13 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
                 <div key={index}>
                   <div className="w-full mb-10">
                     <div className="flex items-center justify-between bg-gray-100 py-4 mb-2">
-                      <div className="ml-6 text-lg font-semibold flex items-center">
+                      <div
+                        className={`ml-6 text-lg font-semibold flex items-center ${
+                          isOptionSelected(dish.id, option.name)
+                            ? "text-lime-600"
+                            : "text-black"
+                        }`}
+                      >
                         {option.choices?.length === 0 && (
                           <input
                             {...register(`${option.name}`)}
@@ -169,6 +204,12 @@ export const DishOrder: React.FC<IDishProps> = ({ dish, onDishUnclick }) => {
                               type="checkbox"
                               id={choice.name}
                               name={choice.name}
+                              onClick={() =>
+                                addChoiceToItem({
+                                  name: option.name,
+                                  choice: choice.name,
+                                })
+                              }
                               value={[option.name, choice.name]}
                               className="mr-5"
                             />
