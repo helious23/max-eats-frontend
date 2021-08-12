@@ -5,7 +5,7 @@ import { getOrder, getOrderVariables } from "../__generated__/getOrder";
 import { PageTitle } from "../components/page-title";
 import { useMe } from "../hooks/useMe";
 import { editOrder, editOrderVariables } from "../__generated__/editOrder";
-import { OrderStatus } from "../__generated__/globalTypes";
+import { OrderStatus, UserRole } from "../__generated__/globalTypes";
 import { useEffect } from "react";
 import { orderUpdates } from "../__generated__/orderUpdates";
 
@@ -142,13 +142,13 @@ export const Order = () => {
             </div>
           </div>
           <div className="border-r border-l border-gray-700 row-span-2 border-b h-24 flex items-center justify-center text-xl">
-            {userData?.me.role === "Client" && (
+            {userData?.me.role === UserRole.Client && (
               <div className="text-lime-600 font-medium">
                 현재 상태 : {data?.getOrder.order?.status}
               </div>
             )}
-            {userData?.me.role === "Owner" && (
-              <div className="w-full mx-3">
+            {userData?.me.role === UserRole.Owner && (
+              <div className="w-full mx-3 flex items-center justify-center">
                 {data?.getOrder.order?.status === OrderStatus.Pending && (
                   <button
                     onClick={() => onButtonClick(OrderStatus.Cooking)}
@@ -157,14 +157,20 @@ export const Order = () => {
                     주문 수락 하기
                   </button>
                 )}
-                {data?.getOrder.order?.status === OrderStatus.Cooked && (
+                {data?.getOrder.order?.status === OrderStatus.Cooking && (
                   <button
                     onClick={() => onButtonClick(OrderStatus.Cooked)}
                     className="btn w-full"
                   >
-                    요리 완료
+                    배달 준비 완료
                   </button>
                 )}
+                {data?.getOrder.order?.status !== OrderStatus.Cooking &&
+                  data?.getOrder.order?.status !== OrderStatus.Pending && (
+                    <div className="text-lime-600 font-medium">
+                      현재 상태 : {data?.getOrder.order?.status}
+                    </div>
+                  )}
               </div>
             )}
           </div>
