@@ -16,63 +16,30 @@ import { MyRestaurant } from "../pages/owner/my-restaurant";
 import { AddDish } from "../pages/owner/add-dish";
 import { EditDish } from "../pages/owner/edit-dish";
 import { Order } from "../pages/order";
+import { Dashboard } from "../pages/driver/dashboard";
 
 const clientRoutes = [
-  {
-    path: routes.home,
-    component: <Restaurants />,
-  },
-  {
-    path: routes.search,
-    component: <Search />,
-  },
-  {
-    path: routes.category,
-    component: <Category />,
-  },
-  {
-    path: routes.restaurant,
-    component: <RestaurantDetail />,
-  },
+  { path: routes.home, component: <Restaurants /> },
+  { path: routes.search, component: <Search /> },
+  { path: routes.category, component: <Category /> },
+  { path: routes.restaurant, component: <RestaurantDetail /> },
 ];
 
 const commonRoutes = [
-  {
-    path: routes.confirmEmail,
-    component: <ConfirmEmail />,
-  },
-  {
-    path: routes.editProfile,
-    component: <EditProfile />,
-  },
-  {
-    path: routes.orders,
-    component: <Order />,
-  },
+  { path: routes.confirmEmail, component: <ConfirmEmail /> },
+  { path: routes.editProfile, component: <EditProfile /> },
+  { path: routes.orders, component: <Order /> },
 ];
 
 const ownerRoutes = [
-  {
-    path: routes.home,
-    component: <MyRestaurants />,
-  },
-  {
-    path: routes.addRestaurant,
-    component: <AddRestaurant />,
-  },
-  {
-    path: routes.restaurant,
-    component: <MyRestaurant />,
-  },
-  {
-    path: routes.addDish,
-    component: <AddDish />,
-  },
-  {
-    path: routes.editDish,
-    component: <EditDish />,
-  },
+  { path: routes.home, component: <MyRestaurants /> },
+  { path: routes.addRestaurant, component: <AddRestaurant /> },
+  { path: routes.restaurant, component: <MyRestaurant /> },
+  { path: routes.addDish, component: <AddDish /> },
+  { path: routes.editDish, component: <EditDish /> },
 ];
+
+const driverRoutes = [{ path: routes.home, component: <Dashboard /> }];
 
 export const LoggedInRouter = () => {
   const { data, loading, error } = useMe();
@@ -100,6 +67,12 @@ export const LoggedInRouter = () => {
           ))}
         {data.me.role === UserRole.Owner &&
           ownerRoutes.map((route) => (
+            <Route key={route.path} path={route.path} exact>
+              {route.component}
+            </Route>
+          ))}
+        {data.me.role === UserRole.Delivery &&
+          driverRoutes.map((route) => (
             <Route key={route.path} path={route.path} exact>
               {route.component}
             </Route>
