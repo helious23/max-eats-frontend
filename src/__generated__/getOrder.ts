@@ -21,15 +21,15 @@ export interface getOrder_getOrder_order_customer {
 
 export interface getOrder_getOrder_order_restaurant {
   __typename: "Restaurant";
+  id: number;
   name: string;
 }
 
 export interface getOrder_getOrder_order {
   __typename: "Order";
   id: number;
-  createdAt: any;
-  total: number | null;
   status: OrderStatus;
+  total: number | null;
   driver: getOrder_getOrder_order_driver | null;
   customer: getOrder_getOrder_order_customer | null;
   restaurant: getOrder_getOrder_order_restaurant | null;
