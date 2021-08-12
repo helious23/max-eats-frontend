@@ -34,7 +34,6 @@ export const Dashboard = () => {
       enableHighAccuracy: true,
     });
   }, []);
-  console.log(driverCoords);
 
   useEffect(() => {
     if (map && maps) {
