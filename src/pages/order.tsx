@@ -1,13 +1,13 @@
 import { Link, useParams } from "react-router-dom";
-import { gql, useQuery, useSubscription } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import { FULL_ORDER_FRAGMENT } from "../fragment";
 import { getOrder, getOrderVariables } from "../__generated__/getOrder";
 import { PageTitle } from "../components/page-title";
 import { useMe } from "../hooks/useMe";
-import {
-  orderUpdates,
-  orderUpdatesVariables,
-} from "../__generated__/orderUpdates";
+import { editOrder, editOrderVariables } from "../__generated__/editOrder";
+import { OrderStatus } from "../__generated__/globalTypes";
+import { useEffect } from "react";
+import { orderUpdates } from "../__generated__/orderUpdates";
 
 const GET_ORDER = gql`
   query getOrder($input: GetOrderInput!) {
@@ -31,6 +31,15 @@ const ORDER_SUBSCRIPTION = gql`
   ${FULL_ORDER_FRAGMENT}
 `;
 
+const EDIT_ORDER = gql`
+  mutation editOrder($input: EditOrderInput!) {
+    editOrder(input: $input) {
+      ok
+      error
+    }
+  }
+`;
+
 interface IParams {
   id: string;
 }
@@ -38,25 +47,60 @@ interface IParams {
 export const Order = () => {
   const { id } = useParams<IParams>();
   const { data: userData } = useMe();
-  const { data } = useQuery<getOrder, getOrderVariables>(GET_ORDER, {
-    variables: {
-      input: {
-        id: +id,
+  const [editOrderMutation] = useMutation<editOrder, editOrderVariables>(
+    EDIT_ORDER
+  );
+  const { data, subscribeToMore } = useQuery<getOrder, getOrderVariables>(
+    GET_ORDER,
+    {
+      variables: {
+        input: {
+          id: +id,
+        },
       },
-    },
-  });
-  const { data: subscriptionData } = useSubscription<
-    orderUpdates,
-    orderUpdatesVariables
-  >(ORDER_SUBSCRIPTION, {
-    variables: {
-      input: {
-        id: +id,
-      },
-    },
-  });
+    }
+  );
 
-  console.log(subscriptionData);
+  useEffect(() => {
+    if (data?.getOrder.ok) {
+      subscribeToMore({
+        document: ORDER_SUBSCRIPTION, // 어떤 subscription 인지
+        variables: {
+          input: {
+            id: +id,
+          },
+        },
+        updateQuery: (
+          prev, // 기존 query 에서 받아오는 data
+          {
+            subscriptionData: { data }, // subscription 으로 받아오는 data
+          }: { subscriptionData: { data: orderUpdates } }
+        ) => {
+          if (!data) return prev; // subscroption data 가 없으면 기존 data return
+          return {
+            // query 의 data 구조와 동일하게 만들어야됨
+            getOrder: {
+              ...prev.getOrder, // ok, error
+              order: {
+                ...data.orderUpdates, // subscription 으로 바뀌는 data
+              },
+            },
+          };
+        },
+      });
+    }
+  }, [data, id, subscribeToMore]);
+
+  const onButtonClick = (newStatus: OrderStatus) => {
+    editOrderMutation({
+      variables: {
+        input: {
+          id: +id,
+          status: newStatus,
+        },
+      },
+    });
+  };
 
   return (
     <div>
@@ -105,11 +149,21 @@ export const Order = () => {
             )}
             {userData?.me.role === "Owner" && (
               <div className="w-full mx-3">
-                {data?.getOrder.order?.status === "Pending" && (
-                  <button className="btn w-full">주문 수락 하기</button>
+                {data?.getOrder.order?.status === OrderStatus.Pending && (
+                  <button
+                    onClick={() => onButtonClick(OrderStatus.Cooking)}
+                    className="btn w-full"
+                  >
+                    주문 수락 하기
+                  </button>
                 )}
-                {data?.getOrder.order?.status === "Cooking" && (
-                  <button className="btn w-full">요리 완료</button>
+                {data?.getOrder.order?.status === OrderStatus.Cooked && (
+                  <button
+                    onClick={() => onButtonClick(OrderStatus.Cooked)}
+                    className="btn w-full"
+                  >
+                    요리 완료
+                  </button>
                 )}
               </div>
             )}
