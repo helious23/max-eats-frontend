@@ -47,18 +47,22 @@ export const DishOrder: React.FC<IDishProps> = ({
     }
   };
 
-  const [createOrderMutation] = useMutation<createOrder, createOrderVariables>(
-    CREATE_ORDER_MUTATION,
-    {
-      onCompleted,
-    }
-  );
+  const [createOrderMutation, { loading }] = useMutation<
+    createOrder,
+    createOrderVariables
+  >(CREATE_ORDER_MUTATION, {
+    onCompleted,
+  });
 
   useEffect(() => {
     setOrderItems([{ dishId: dish.id, options: [] }]);
   }, [dish.id]);
 
   const onOrderSubmit = () => {
+    if (loading) {
+      alert("주문이 진행 중입니다");
+      return;
+    }
     const ok = window.confirm("주문을 하시겠습니까?");
     if (ok) {
       createOrderMutation({

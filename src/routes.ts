@@ -9,6 +9,7 @@ const routes = {
   addRestaurant: "/add-restaurant",
   addDish: "/restaurant/:restaurantId/add-dish",
   editDish: "/restaurant/:restaurantId/edit-dish/:dishId",
+  orders: "/orders/:id",
 };
 
 export default routes;
