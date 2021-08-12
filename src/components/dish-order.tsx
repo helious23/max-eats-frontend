@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
 import { gql, useMutation } from "@apollo/client";
-import { useForm } from "react-hook-form";
 import { CreateOrderItemInput } from "../__generated__/globalTypes";
 import { DishOption } from "./dish-option";
 import { useHistory } from "react-router-dom";
@@ -37,9 +36,6 @@ export const DishOrder: React.FC<IDishProps> = ({
   const [orderAmount, setOrderAmount] = useState(1);
   const [orderPrice, setOrderPrice] = useState(dish.price);
   const [orderItems, setOrderItems] = useState<CreateOrderItemInput[]>([]);
-  const { register, handleSubmit } = useForm({
-    mode: "onChange",
-  });
 
   const onCompleted = (data: createOrder) => {
     const {
@@ -62,7 +58,7 @@ export const DishOrder: React.FC<IDishProps> = ({
     setOrderItems([{ dishId: dish.id, options: [] }]);
   }, [dish.id]);
 
-  const onSubmit = () => {
+  const onOrderSubmit = () => {
     const ok = window.confirm("주문을 하시겠습니까?");
     if (ok) {
       createOrderMutation({
@@ -196,10 +192,7 @@ export const DishOrder: React.FC<IDishProps> = ({
   };
 
   return (
-    <form
-      className="w-full h-full z-10 fixed top-0 left-0 backdrop-filter backdrop-brightness-50"
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <div className="w-full h-full z-10 fixed top-0 left-0 backdrop-filter backdrop-brightness-50">
       <div className="flex justify-center items-center h-full">
         <div className="bg-white w-5/6 h-5/6 lg:w-4/6 lg:h-4/6 lg:absolute grid grid-row-2 lg:grid-cols-2 lg:mb-32 overflow-auto">
           <div className="h-full">
@@ -236,7 +229,6 @@ export const DishOrder: React.FC<IDishProps> = ({
                   key={index}
                   dishId={dish.id}
                   option={option}
-                  register={register}
                   orderItems={orderItems}
                   addOptionToItem={addOptionToItem}
                   addChoiceToItem={addChoiceToItem}
@@ -270,7 +262,10 @@ export const DishOrder: React.FC<IDishProps> = ({
                 </div>
                 <div className="col-start-2 col-span-3 md:col-start-3 md:col-span-2 lg:col-span-3 flex justify-center mx-3 ml-10 lg:mx-10 py-3 cursor-pointer btn min:w-full">
                   <button className="grid grid-cols-3 w-full">
-                    <div className="col-span-2 text-center">
+                    <div
+                      className="col-span-2 text-center"
+                      onClick={onOrderSubmit}
+                    >
                       {orderAmount} 개 주문하기{" "}
                     </div>
                     <div className="text-center">$ {orderPrice}</div>
@@ -281,6 +276,6 @@ export const DishOrder: React.FC<IDishProps> = ({
           </div>
         </div>
       </div>
-    </form>
+    </div>
   );
 };

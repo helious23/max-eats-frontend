@@ -57,6 +57,7 @@
     ]
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.3.3",
     "@testing-library/cypress": "^8.0.0",
     "@types/react-helmet": "^6.1.2",
     "@types/react-router-dom": "^5.1.8",

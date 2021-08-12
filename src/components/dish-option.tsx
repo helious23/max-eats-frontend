@@ -1,4 +1,3 @@
-import { FieldValues, UseFormRegister } from "react-hook-form";
 import { restaurant_restaurant_restaurant_menu_options } from "../__generated__/restaurant";
 import { CreateOrderItemInput } from "../__generated__/globalTypes";
 
@@ -6,7 +5,6 @@ interface IDishOptionProps {
   dishId: number;
   isOptionSelected: boolean;
   orderItems: CreateOrderItemInput[];
-  register: UseFormRegister<FieldValues>;
   option: restaurant_restaurant_restaurant_menu_options;
   addOptionToItem: (dishId: number, optionName: string) => void;
   addChoiceToItem: (
@@ -22,7 +20,6 @@ interface IDishOptionProps {
 export const DishOption: React.FC<IDishOptionProps> = ({
   dishId,
   option,
-  register,
   orderItems,
   addOptionToItem,
   addChoiceToItem,
@@ -67,42 +64,49 @@ export const DishOption: React.FC<IDishOptionProps> = ({
     <div className="w-full mb-10">
       <div className="flex items-center justify-between bg-gray-100 py-4 mb-2">
         <div
-          className={`ml-6 text-lg font-semibold flex items-center ${
+          className={`ml-6 text-lg font-semibold flex items-center justify-between w-full ${
             isOptionSelected ? "text-lime-600" : "text-black"
           }`}
         >
-          {option.choices?.length === 0 && (
-            <input
-              {...register(`${option.name}`)}
-              type="checkbox"
-              id={option.name}
-              name={option.name}
-              onClick={onOptionClick}
-              value={[option.name]}
-              className="mr-5"
-            />
+          {option.choices?.length === 0 ? (
+            <div className="flex items-center justify-between w-full">
+              <input
+                type="checkbox"
+                className="mr-5 cursor-pointer bg-white border border-gray-400 h-5 w-5 rounded-md focus:outline-none 
+                "
+                onClick={onOptionClick}
+                id={option.name}
+              />
+              <label
+                htmlFor={option.name}
+                className="cursor-pointer flex items-center justify-between w-full"
+              >
+                <div>{option.name}</div>
+                {option.extra !== 0 && (
+                  <div className="mr-6 text-sm opacity-75 text-right w-10">
+                    $ {option.extra}
+                  </div>
+                )}
+              </label>
+            </div>
+          ) : (
+            <div>{option.name}</div>
           )}
-          <div>{option.name}</div>
         </div>
-        {option.extra !== 0 && (
-          <div className="mr-6 text-sm opacity-75">$ {option.extra}</div>
-        )}
       </div>
       <div className="mx-6">
         {option.choices?.map((choice, index) => (
           <div key={index} className="flex items-center justify-between">
             <div
-              className={`flex items-center ${
+              className={`flex items-center justify-between w-full mt-2 ${
                 isChoiceSelected(dishId, choice.name)
                   ? "text-lime-600"
                   : "text-black"
               }`}
             >
               <input
-                {...register(`${choice.name}`)}
                 type="checkbox"
                 id={choice.name}
-                name={choice.name}
                 onClick={() => {
                   if (isChoiceSelected(dishId, choice.name)) {
                     removeChoiceFromItem(dishId, choice.name);
@@ -116,13 +120,17 @@ export const DishOption: React.FC<IDishOptionProps> = ({
                     }
                   }
                 }}
-                value={[option.name, choice.name]}
-                className="mr-5"
+                className="mr-5 cursor-pointer"
               />
 
-              <div className=" mt-1">{choice.name}</div>
+              <label
+                htmlFor={choice.name}
+                className="cursor-pointer flex items-center justify-between w-full"
+              >
+                <div>{choice.name}</div>
+                <div className="text-sm opacity-75">$ {choice.extra}</div>
+              </label>
             </div>
-            <div className="text-sm opacity-75">$ {choice.extra}</div>
           </div>
         ))}
       </div>
