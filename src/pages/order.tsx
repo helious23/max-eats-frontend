@@ -1,8 +1,9 @@
 import { Link, useParams } from "react-router-dom";
 import { gql, useQuery, useSubscription } from "@apollo/client";
-import { FULL_ORDER_FRAGMENT, ORDERS_FRAGMENT } from "../fragment";
+import { FULL_ORDER_FRAGMENT } from "../fragment";
 import { getOrder, getOrderVariables } from "../__generated__/getOrder";
 import { PageTitle } from "../components/page-title";
+import { useMe } from "../hooks/useMe";
 import {
   orderUpdates,
   orderUpdatesVariables,
@@ -36,6 +37,7 @@ interface IParams {
 
 export const Order = () => {
   const { id } = useParams<IParams>();
+  const { data: userData } = useMe();
   const { data } = useQuery<getOrder, getOrderVariables>(GET_ORDER, {
     variables: {
       input: {
@@ -61,7 +63,7 @@ export const Order = () => {
       <PageTitle title={`주문 번호 #${id}`} />
       <div className="mt-32 flex flex-col items-center justify-center">
         <div className="grid grid-rows-8 w-3/4 lg:w-4/12">
-          <div className="bg-lime-600 text-white text-lg py-3 text-center">
+          <div className="bg-gray-800 text-white text-lg py-3 text-center">
             주문 번호 #{data?.getOrder.order?.id}
           </div>
           <div className=" border-r border-l border-gray-700 text-center text-3xl row-span-2 h-24 flex items-center justify-center">
@@ -96,9 +98,21 @@ export const Order = () => {
             </div>
           </div>
           <div className="border-r border-l border-gray-700 row-span-2 border-b h-24 flex items-center justify-center text-xl">
-            <div className="text-lime-600 font-medium">
-              현재 상태 : {data?.getOrder.order?.status}
-            </div>
+            {userData?.me.role === "Client" && (
+              <div className="text-lime-600 font-medium">
+                현재 상태 : {data?.getOrder.order?.status}
+              </div>
+            )}
+            {userData?.me.role === "Owner" && (
+              <div className="w-full mx-3">
+                {data?.getOrder.order?.status === "Pending" && (
+                  <button className="btn w-full">주문 수락 하기</button>
+                )}
+                {data?.getOrder.order?.status === "Cooking" && (
+                  <button className="btn w-full">요리 완료</button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
