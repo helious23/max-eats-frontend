@@ -38,7 +38,8 @@ export const Dashboard = () => {
   useEffect(() => {
     if (map && maps) {
       map.panTo(new google.maps.LatLng(driverCoords.lat, driverCoords.lng));
-      // const geocoder = new google.maps.Geocoder(); // coods 로 주소 검색
+      /* client login 시 header 에 주소 보여주기, owner login 시 restaurant 선택 시 주소 보여주기
+      const geocoder = new google.maps.Geocoder(); // coods 로 주소 검색
       // geocoder.geocode(
       //   {
       //     location: new google.maps.LatLng(driverCoords.lat, driverCoords.lng),
@@ -46,7 +47,8 @@ export const Dashboard = () => {
       //   (results, status) => {
       //     console.log(status, results);
       //   }
-      // );
+       );
+       */
     }
   }, [driverCoords.lat, driverCoords.lng, map, maps]);
 
@@ -54,6 +56,40 @@ export const Dashboard = () => {
     map.panTo(new maps.LatLng(driverCoords.lat, driverCoords.lng));
     setMap(map);
     setMaps(maps);
+  };
+
+  const onGetRouteClick = () => {
+    if (map) {
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer({
+        polylineOptions: {
+          strokeColor: "#65A20C",
+          strokeOpacity: 0.8,
+          strokeWeight: 5,
+        },
+      });
+      directionsRenderer.setMap(map);
+      directionsService.route(
+        {
+          origin: {
+            location: new google.maps.LatLng(
+              driverCoords.lat,
+              driverCoords.lng
+            ),
+          },
+          destination: {
+            location: new google.maps.LatLng(
+              driverCoords.lat + 0.05,
+              driverCoords.lng + 0.02
+            ),
+          },
+          travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (result) => {
+          directionsRenderer.setDirections(result);
+        }
+      );
+    }
   };
 
   return (
@@ -67,12 +103,13 @@ export const Dashboard = () => {
           onGoogleApiLoaded={onApiLoaded}
           bootstrapURLKeys={{ key: "AIzaSyAPQD5o2tatgu08e3qQn9E2_7SmJ_w0jVg" }}
           defaultZoom={17}
-          draggable={false}
+          draggable={true}
           defaultCenter={{ lat: 35.2084852, lng: 129.0829893 }}
         >
           <Driver lat={driverCoords.lat} lng={driverCoords.lng} />
         </GoogleMapReact>
       </div>
+      <button onClick={onGetRouteClick}>경로 검색</button>
     </div>
   );
 };
