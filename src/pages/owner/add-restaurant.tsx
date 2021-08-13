@@ -81,35 +81,37 @@ export const AddRestaurant = () => {
         variables: { input: { page: 1 } },
       }); // page 1 의 cache data 읽음
       console.log(queryResult);
-      client.writeQuery({
-        query: MY_RESTAURANTS_QUERY,
-        variables: { input: { page: 1 } },
-        data: {
-          myRestaurants: {
-            ...queryResult.myRestaurants, // 기존 cache 에 있는 data
-            totalResults: queryResult.myRestaurants?.totalResults + 1,
-            totalPages: Math.ceil(
-              (queryResult.myRestaurants?.totalResults + 1) / 9
-            ),
-            restaurants: [
-              {
-                address,
-                category: {
-                  name: categoryName,
-                  slug: categoryName.replace(/ +/g, "-"),
-                  __typename: "Category",
+      if (queryResult) {
+        client.writeQuery({
+          query: MY_RESTAURANTS_QUERY,
+          variables: { input: { page: 1 } },
+          data: {
+            myRestaurants: {
+              ...queryResult.myRestaurants, // 기존 cache 에 있는 data
+              totalResults: queryResult.myRestaurants?.totalResults + 1,
+              totalPages: Math.ceil(
+                (queryResult.myRestaurants?.totalResults + 1) / 9
+              ),
+              restaurants: [
+                {
+                  address,
+                  category: {
+                    name: categoryName,
+                    slug: categoryName.replace(/ +/g, "-"),
+                    __typename: "Category",
+                  },
+                  coverImg: imageUrl,
+                  id: restaurantId,
+                  isPromoted: false,
+                  name,
+                  __typename: "Restaurant",
                 },
-                coverImg: imageUrl,
-                id: restaurantId,
-                isPromoted: false,
-                name,
-                __typename: "Restaurant",
-              },
-              ...queryResult.myRestaurants.restaurants,
-            ],
+                ...queryResult.myRestaurants.restaurants,
+              ],
+            },
           },
-        },
-      });
+        });
+      }
       alert("식당이 등록 되었습니다");
       history.push(routes.home);
     }
