@@ -1,9 +1,10 @@
 import GoogleMapReact from "google-map-react";
 import { useEffect, useState } from "react";
-import { gql, useSubscription } from "@apollo/client";
+import { gql, useSubscription, useMutation } from "@apollo/client";
 import { FULL_ORDER_FRAGMENT } from "../../fragment";
 import { cookedOrders } from "../../__generated__/cookedOrders";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import { takeOrder, takeOrderVariables } from "../../__generated__/takeOrder";
 
 const COOKED_ORDERS_SUBSCRIPTION = gql`
   subscription cookedOrders {
@@ -12,6 +13,15 @@ const COOKED_ORDERS_SUBSCRIPTION = gql`
     }
   }
   ${FULL_ORDER_FRAGMENT}
+`;
+
+const TAKE_ORDER_MUTATION = gql`
+  mutation takeOrder($input: TakeOrderInput!) {
+    takeOrder(input: $input) {
+      ok
+      error
+    }
+  }
 `;
 
 interface ICoords {
@@ -71,48 +81,73 @@ export const Dashboard = () => {
     setMaps(maps);
   };
 
-  const makeRoute = () => {
-    if (map) {
-      const directionsService = new google.maps.DirectionsService();
-      const directionsRenderer = new google.maps.DirectionsRenderer({
-        polylineOptions: {
-          strokeColor: "#65A20C",
-          strokeOpacity: 0.8,
-          strokeWeight: 5,
-        },
-      });
-      directionsRenderer.setMap(map);
-      directionsService.route(
-        {
-          origin: {
-            location: new google.maps.LatLng(
-              driverCoords.lat,
-              driverCoords.lng
-            ),
-          },
-          destination: {
-            location: new google.maps.LatLng(
-              driverCoords.lat + 0.05,
-              driverCoords.lng + 0.02
-            ),
-          },
-          travelMode: google.maps.TravelMode.DRIVING, // 국내는 TRANSIT 만 지원 가능
-        },
-        (result) => {
-          directionsRenderer.setDirections(result);
-        }
-      );
-    }
-  };
   const { data: cookedOrdersData } = useSubscription<cookedOrders>(
     COOKED_ORDERS_SUBSCRIPTION
   );
 
   useEffect(() => {
     if (cookedOrdersData?.cookedOrders.id) {
-      makeRoute();
+      if (map) {
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer({
+          polylineOptions: {
+            strokeColor: "#65A20C",
+            strokeOpacity: 0.8,
+            strokeWeight: 5,
+          },
+        });
+        directionsRenderer.setMap(map);
+        directionsService.route(
+          {
+            origin: {
+              location: new google.maps.LatLng(
+                driverCoords.lat,
+                driverCoords.lng
+              ),
+            },
+            destination: {
+              location: new google.maps.LatLng(
+                driverCoords.lat + 0.05,
+                driverCoords.lng + 0.02
+              ),
+            },
+            travelMode: google.maps.TravelMode.DRIVING, // 국내는 TRANSIT 만 지원 가능
+          },
+          (result) => {
+            directionsRenderer.setDirections(result);
+          }
+        );
+      }
     }
-  });
+  }, [cookedOrdersData, driverCoords.lat, driverCoords.lng, map]);
+
+  const history = useHistory();
+
+  const onCompleted = (data: takeOrder) => {
+    const {
+      takeOrder: { ok },
+    } = data;
+    if (ok) {
+      history.push(`/orders/${cookedOrdersData?.cookedOrders.id}`);
+    }
+  };
+
+  const [takeOrderMutation] = useMutation<takeOrder, takeOrderVariables>(
+    TAKE_ORDER_MUTATION,
+    {
+      onCompleted,
+    }
+  );
+
+  const triggerMutation = (orderId: number) => {
+    takeOrderMutation({
+      variables: {
+        input: {
+          id: orderId,
+        },
+      },
+    });
+  };
 
   return (
     <div>
@@ -139,18 +174,19 @@ export const Dashboard = () => {
             <div className="text-center my-3 text-xl font-medium">
               <Link
                 to={`/restaurant/${cookedOrdersData?.cookedOrders.restaurant?.id}`}
+                className="link"
               >
                 {cookedOrdersData?.cookedOrders.restaurant?.name}
-              </Link>
+              </Link>{" "}
               에서 주문을 픽업하세요!
             </div>
 
-            <Link
-              to={`/orders/${cookedOrdersData?.cookedOrders.id}`}
+            <button
+              onClick={() => triggerMutation(cookedOrdersData?.cookedOrders.id)}
               className="btn w-full mt-5 block text-center"
             >
               주문 픽업하러 가기 &rarr;
-            </Link>
+            </button>
           </div>
         ) : (
           <div className="text-center text-2xl font-medium">

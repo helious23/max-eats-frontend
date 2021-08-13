@@ -142,37 +142,64 @@ export const Order = () => {
             </div>
           </div>
           <div className="border-r border-l border-gray-700 row-span-2 border-b h-24 flex items-center justify-center text-xl">
-            {userData?.me.role === UserRole.Client && (
-              <div className="text-lime-600 font-medium">
-                현재 상태 : {data?.getOrder.order?.status}
-              </div>
-            )}
-            {userData?.me.role === UserRole.Owner && (
-              <div className="w-full mx-3 flex items-center justify-center">
-                {data?.getOrder.order?.status === OrderStatus.Pending && (
-                  <button
-                    onClick={() => onButtonClick(OrderStatus.Cooking)}
-                    className="btn w-full"
-                  >
-                    주문 수락 하기
-                  </button>
-                )}
-                {data?.getOrder.order?.status === OrderStatus.Cooking && (
-                  <button
-                    onClick={() => onButtonClick(OrderStatus.Cooked)}
-                    className="btn w-full"
-                  >
-                    배달 준비 완료
-                  </button>
-                )}
-                {data?.getOrder.order?.status !== OrderStatus.Cooking &&
-                  data?.getOrder.order?.status !== OrderStatus.Pending && (
-                    <div className="text-lime-600 font-medium">
-                      현재 상태 : {data?.getOrder.order?.status}
-                    </div>
+            <div className="flex flex-col justify-center items-center w-full">
+              {userData?.me.role === UserRole.Client && (
+                <div className="text-lime-600 font-medium">
+                  현재 상태 : {data?.getOrder.order?.status}
+                </div>
+              )}
+              {userData?.me.role === UserRole.Owner && (
+                <div className="w-full mx-3 flex items-center justify-center">
+                  {data?.getOrder.order?.status === OrderStatus.Pending && (
+                    <button
+                      onClick={() => onButtonClick(OrderStatus.Cooking)}
+                      className="btn w-full mx-3"
+                    >
+                      주문 수락 하기
+                    </button>
                   )}
-              </div>
-            )}
+                  {data?.getOrder.order?.status === OrderStatus.Cooking && (
+                    <button
+                      onClick={() => onButtonClick(OrderStatus.Cooked)}
+                      className="btn w-full mx-3"
+                    >
+                      배달 준비 완료
+                    </button>
+                  )}
+                  {data?.getOrder.order?.status !== OrderStatus.Cooking &&
+                    data?.getOrder.order?.status !== OrderStatus.Pending && (
+                      <div className="text-lime-600 font-medium">
+                        현재 상태 : {data?.getOrder.order?.status}
+                      </div>
+                    )}
+                </div>
+              )}
+              {userData?.me.role === UserRole.Delivery && (
+                <div className="w-full mx-3 flex items-center justify-center">
+                  {data?.getOrder.order?.status === OrderStatus.Cooked && (
+                    <button
+                      onClick={() => onButtonClick(OrderStatus.PickedUp)}
+                      className="btn w-full mx-3"
+                    >
+                      주문 픽업 완료
+                    </button>
+                  )}
+                  {data?.getOrder.order?.status === OrderStatus.PickedUp && (
+                    <button
+                      onClick={() => onButtonClick(OrderStatus.Delivered)}
+                      className="btn w-full mx-3"
+                    >
+                      배달 완료
+                    </button>
+                  )}
+                </div>
+              )}
+              {data?.getOrder.order?.status === OrderStatus.Delivered && (
+                <div className="text-lime-600 font-medium mt-2">
+                  Max Eats를 이용해 주셔서 감사합니다
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

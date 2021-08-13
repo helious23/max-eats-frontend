@@ -190,9 +190,7 @@ export const MyRestaurant = () => {
                       dy={-20}
                     />
                   }
-                  animate={{
-                    duration: 500,
-                  }}
+                  animate={{}}
                   interpolation={"linear"}
                   style={{
                     data: {

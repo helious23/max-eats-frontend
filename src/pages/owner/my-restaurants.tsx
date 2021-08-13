@@ -54,6 +54,7 @@ export const MyRestaurants = () => {
       ) : (
         !loading && (
           <div className="container">
+            <div className="text-2xl font-semibold">등록된 식당</div>
             <div className="grid md:grid-cols-3 gap-x-5 gap-y-10 my-16">
               {data?.myRestaurants.restaurants &&
                 data?.myRestaurants.restaurants.map((restaurant) => (
