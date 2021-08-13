@@ -1,5 +1,18 @@
 import GoogleMapReact from "google-map-react";
 import { useEffect, useState } from "react";
+import { gql, useSubscription } from "@apollo/client";
+import { FULL_ORDER_FRAGMENT } from "../../fragment";
+import { cookedOrders } from "../../__generated__/cookedOrders";
+import { Link } from "react-router-dom";
+
+const COOKED_ORDERS_SUBSCRIPTION = gql`
+  subscription cookedOrders {
+    cookedOrders {
+      ...FullOrderParts
+    }
+  }
+  ${FULL_ORDER_FRAGMENT}
+`;
 
 interface ICoords {
   lat: number;
@@ -58,7 +71,7 @@ export const Dashboard = () => {
     setMaps(maps);
   };
 
-  const onGetRouteClick = () => {
+  const makeRoute = () => {
     if (map) {
       const directionsService = new google.maps.DirectionsService();
       const directionsRenderer = new google.maps.DirectionsRenderer({
@@ -83,7 +96,7 @@ export const Dashboard = () => {
               driverCoords.lng + 0.02
             ),
           },
-          travelMode: google.maps.TravelMode.DRIVING,
+          travelMode: google.maps.TravelMode.DRIVING, // 국내는 TRANSIT 만 지원 가능
         },
         (result) => {
           directionsRenderer.setDirections(result);
@@ -91,6 +104,15 @@ export const Dashboard = () => {
       );
     }
   };
+  const { data: cookedOrdersData } = useSubscription<cookedOrders>(
+    COOKED_ORDERS_SUBSCRIPTION
+  );
+
+  useEffect(() => {
+    if (cookedOrdersData?.cookedOrders.id) {
+      makeRoute();
+    }
+  });
 
   return (
     <div>
@@ -109,7 +131,33 @@ export const Dashboard = () => {
           <Driver lat={driverCoords.lat} lng={driverCoords.lng} />
         </GoogleMapReact>
       </div>
-      <button onClick={onGetRouteClick}>경로 검색</button>
+
+      <div className="max-w-screen-sm mx-auto bg-white relative -top-10 shadow-lg py-8 px-5">
+        {cookedOrdersData?.cookedOrders.restaurant ? (
+          <div>
+            <div className="text-center text-3xl font-medium">새로운 주문</div>
+            <div className="text-center my-3 text-xl font-medium">
+              <Link
+                to={`/restaurant/${cookedOrdersData?.cookedOrders.restaurant?.id}`}
+              >
+                {cookedOrdersData?.cookedOrders.restaurant?.name}
+              </Link>
+              에서 주문을 픽업하세요!
+            </div>
+
+            <Link
+              to={`/orders/${cookedOrdersData?.cookedOrders.id}`}
+              className="btn w-full mt-5 block text-center"
+            >
+              주문 픽업하러 가기 &rarr;
+            </Link>
+          </div>
+        ) : (
+          <div className="text-center text-2xl font-medium">
+            아직 픽업 가능한 주문이 없습니다...
+          </div>
+        )}
+      </div>
     </div>
   );
 };
