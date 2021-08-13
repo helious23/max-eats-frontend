@@ -136,7 +136,7 @@ export const AddRestaurant = () => {
       const formBody = new FormData();
       formBody.append("file", actualImage);
       const { url: coverImg } = await (
-        await fetch("https://max-eats.shop/uploads/", {
+        await fetch("https://max-eats-backend.herokuapp.com/uploads/", {
           method: "POST",
           body: formBody,
         })
