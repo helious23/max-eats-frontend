@@ -44,6 +44,7 @@ interface IFormProps {
   name: string;
   address: string;
   categoryName: string;
+  categoryFile: FileList;
   file: FileList;
 }
 
@@ -133,7 +134,9 @@ export const AddRestaurant = () => {
   const onSubmit = async (data: IFormProps) => {
     try {
       setUploading(true);
-      const { file, name, categoryName, address } = data;
+      const { file, name, categoryName, address, categoryFile } = data;
+
+      // restaurant image
       const actualImage = file[0];
       const formBody = new FormData();
       formBody.append("file", actualImage);
@@ -144,6 +147,18 @@ export const AddRestaurant = () => {
         })
       ).json();
       setImageUrl(coverImg);
+
+      // category image
+      const categoryActualImage = categoryFile[0];
+      const categoryFormBody = new FormData();
+      categoryFormBody.append("file", categoryActualImage);
+      const { url: categoryImg } = await (
+        await fetch("https://max-eats-backend.herokuapp.com/uploads/", {
+          method: "POST",
+          body: categoryFormBody,
+        })
+      ).json();
+
       createRestaurantMutation({
         variables: {
           input: {
@@ -151,6 +166,7 @@ export const AddRestaurant = () => {
             address,
             categoryName,
             coverImg,
+            categoryImg,
           },
         },
       });
@@ -225,6 +241,14 @@ export const AddRestaurant = () => {
         {formState.errors.categoryName?.message && (
           <FormError errorMessage={formState.errors.categoryName?.message} />
         )}
+        <div className="grid gap-3 grid-cols-2 items-center border py-2 px-2 text-lg">
+          <span className="text-gray-400"> 카테고리 이미지 등록하기 </span>
+          <input
+            type="file"
+            accept="image/*"
+            {...register("categoryFile", { required: true })}
+          />
+        </div>
         <div className="grid gap-3 grid-cols-2 items-center border py-2 px-2 text-lg">
           <span className="text-gray-400"> 대표 사진 등록하기 </span>
           <input

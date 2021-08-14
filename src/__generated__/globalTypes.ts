@@ -60,6 +60,7 @@ export interface CreateRestaurantInput {
   coverImg: string;
   address: string;
   categoryName: string;
+  categoryImg?: string | null;
 }
 
 export interface DeleteDishInput {
