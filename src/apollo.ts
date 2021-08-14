@@ -35,6 +35,8 @@ const wsLink = new WebSocketLink({
     connectionParams: {
       "x-jwt": authTokenVar() || "",
     },
+    minTimeout: 20000,
+    lazy: true,
   },
 });
 
