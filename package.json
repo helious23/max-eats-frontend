@@ -33,11 +33,12 @@
   },
   "scripts": {
     "tailwind:predbuild": "NODE_ENV=production npm run tailwind:build",
-    "tailwind:build": "tailwind -i ./src/styles/tailwind.css -o ./src/styles/styles.css",
-    "start": "npm run apollo:codegen & npm run tailwind:build & react-scripts start",
+    "tailwind:build": "NODE_ENV=production tailwind -i ./src/styles/tailwind.css -o ./src/styles/styles.css",
+    "start": "npm run tailwind:build & react-scripts start",
+    "start:dev": "npm run apollo:codegen & npm run tailwind:build & react-scripts start",
     "apollo:codegen": "rm -rf src/__generated__ && apollo client:codegen src/__generated__ --target=typescript --outputFlat",
     "build": "react-scripts build",
-    "prebuild": "npm run tailwind:build",
+    "prebuild": "rm -rf build && npm run tailwind:build",
     "test": "react-scripts test --verbose",
     "test:cov": "npm test -- --coverage --watchAll=false",
     "eject": "react-scripts eject"
