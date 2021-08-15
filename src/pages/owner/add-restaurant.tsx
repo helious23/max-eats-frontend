@@ -243,11 +243,7 @@ export const AddRestaurant = () => {
         )}
         <div className="grid gap-3 grid-cols-2 items-center border py-2 px-2 text-lg">
           <span className="text-gray-400"> 카테고리 이미지 등록하기 </span>
-          <input
-            type="file"
-            accept="image/*"
-            {...register("categoryFile", { required: true })}
-          />
+          <input type="file" accept="image/*" {...register("categoryFile")} />
         </div>
         <div className="grid gap-3 grid-cols-2 items-center border py-2 px-2 text-lg">
           <span className="text-gray-400"> 대표 사진 등록하기 </span>

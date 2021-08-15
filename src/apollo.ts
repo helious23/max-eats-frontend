@@ -28,7 +28,7 @@ export const logUserOut = () => {
 const wsLink = new WebSocketLink({
   uri:
     process.env.NODE_ENV === "production"
-      ? "ws://3.34.115.151:4000/graphql"
+      ? "wss://max-eats.shop/graphql/graphql"
       : "ws://localhost:4000/graphql",
   options: {
     reconnect: true,
@@ -43,7 +43,7 @@ const wsLink = new WebSocketLink({
 const httpLink = createHttpLink({
   uri:
     process.env.NODE_ENV === "production"
-      ? "http://3.34.115.151:4000/graphql"
+      ? "https://max-eats.shop/graphql/graphql"
       : "http://localhost:4000/graphql",
 });
 
