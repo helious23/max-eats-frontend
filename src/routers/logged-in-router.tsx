@@ -17,6 +17,7 @@ import { AddDish } from "../pages/owner/add-dish";
 import { EditDish } from "../pages/owner/edit-dish";
 import { Order } from "../pages/order";
 import { Dashboard } from "../pages/driver/dashboard";
+import { Notice } from "../pages/client/notice";
 
 const clientRoutes = [
   { path: routes.home, component: <Restaurants /> },
@@ -48,6 +49,16 @@ export const LoggedInRouter = () => {
       <div className="mt-64 flex justify-center items-center">
         <span className="font-medium text-xl tracking-wide">Loading...</span>
       </div>
+    );
+  }
+  if (data.me.verified === false) {
+    return (
+      <Router>
+        <Header />
+        <Switch>
+          <Notice />
+        </Switch>
+      </Router>
     );
   }
   return (

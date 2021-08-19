@@ -10,6 +10,7 @@ const routes = {
   addDish: "/restaurant/:restaurantId/add-dish",
   editDish: "/restaurant/:restaurantId/edit-dish/:dishId",
   orders: "/orders/:id",
+  notice: "/notice",
 };
 
 export default routes;
